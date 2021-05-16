@@ -9,7 +9,6 @@ version:
 
 stages:
   build:
-    image: rust:1.51-alpine3.13
+    image: rust:1.52-alpine
     commands:
-    - cargo --version
-    - cargo build --release
+    - cargo test --release
