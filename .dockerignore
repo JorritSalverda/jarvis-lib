@@ -1,9 +1,0 @@
-.git
-helm
-# target
-
-.dockerignore
-.estafette.yaml
-Dockerfile
-LICENSE
-README.md

@@ -8,8 +8,7 @@ version:
     minor: 1
 
 stages:
-  bake:
-    image: extensions/docker:stable
-    action: build
-    repositories:
-    - jsalverda
+  build:
+    image: rust:1.52
+    commands:
+    - cargo test
