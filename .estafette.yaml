@@ -12,3 +12,11 @@ stages:
     image: rust:1.52
     commands:
     - cargo test
+
+  tag-revision:
+    image: rust:1.52
+    commands:
+    - apt-get update
+    - apt-get install -y --no-install-recommends git
+    - git tag ${ESTAFETTE_BUILD_VERSION}
+    - git push origin ${ESTAFETTE_BUILD_VERSION}
