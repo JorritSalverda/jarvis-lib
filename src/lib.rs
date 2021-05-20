@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
-mod bigquery_client;
-mod config_client;
-mod exporter_service;
-mod measurement_client;
-mod model;
-mod state_client;
+pub mod bigquery_client;
+pub mod config_client;
+pub mod exporter_service;
+pub mod measurement_client;
+pub mod model;
+pub mod state_client;
