@@ -8,6 +8,13 @@ version:
     minor: 1
 
 stages:
+  tag-revision:
+    image: alpine:3.13
+    commands:
+    - apk add git
+    - git tag ${ESTAFETTE_BUILD_VERSION}
+    - git push origin ${ESTAFETTE_BUILD_VERSION}
+
   bake:
     image: extensions/docker:stable
     action: build
@@ -23,10 +30,3 @@ stages:
     - jsalverda
     tags:
     - latest
-
-  tag-revision:
-    image: alpine:3.13
-    commands:
-    - apk add git
-    - git tag ${ESTAFETTE_BUILD_VERSION}
-    - git push origin ${ESTAFETTE_BUILD_VERSION}
