@@ -16,14 +16,14 @@ stages:
     - git push origin ${ESTAFETTE_BUILD_VERSION}
 
   bake:
-    image: extensions/docker:stable
+    image: extensions/docker:dev
     action: build
     container: jarvis-lib-builder
     repositories:
     - jsalverda
 
   push-to-docker-hub:
-    image: extensions/docker:stable
+    image: extensions/docker:dev
     action: push
     container: jarvis-lib-builder
     repositories:
