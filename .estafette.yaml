@@ -8,15 +8,23 @@ version:
     minor: 1
 
 stages:
-  build:
-    image: rust:1.52
-    commands:
-    - cargo test
+  bake:
+    image: extensions/docker:stable
+    action: build
+    container: jarvis-lib-builder
+    repositories:
+    - jsalverda
+
+  push-to-docker-hub:
+    image: extensions/docker:stable
+    action: push
+    container: jarvis-lib-builder
+    repositories:
+    - jsalverda
 
   tag-revision:
-    image: rust:1.52
+    image: alpine:3.13
     commands:
-    - apt-get update
-    - apt-get install -y --no-install-recommends git
+    - apk add git
     - git tag ${ESTAFETTE_BUILD_VERSION}
     - git push origin ${ESTAFETTE_BUILD_VERSION}
