@@ -21,6 +21,8 @@ stages:
     container: jarvis-lib-builder
     repositories:
     - jsalverda
+    tags:
+    - latest
 
   tag-revision:
     image: alpine:3.13

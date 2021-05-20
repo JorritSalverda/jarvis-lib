@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends musl-tools
 RUN rustup target add x86_64-unknown-linux-musl
 
 COPY . .
+RUN cargo test --target x86_64-unknown-linux-musl
 RUN cargo test --release --target x86_64-unknown-linux-musl
 
 # Step 2: Create the reusable builder container image
@@ -19,4 +20,4 @@ WORKDIR app
 RUN apt-get update && apt-get install -y --no-install-recommends musl-tools
 RUN rustup target add x86_64-unknown-linux-musl
 
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release /app/target/x86_64-unknown-linux-musl/release
+COPY --from=builder /app/target /app/target
