@@ -1,0 +1,7 @@
+.git
+
+.dockerignore
+.estafette.yaml
+Dockerfile
+LICENSE
+README.md
