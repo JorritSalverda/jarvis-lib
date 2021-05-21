@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use crate::bigquery_client::BigqueryClient;
-use crate::config_client::ConfigClient;
+use crate::config_client::{ConfigClient,SetDefaults};
 use crate::measurement_client::MeasurementClient;
 use crate::state_client::StateClient;
 use serde::de::DeserializeOwned;
@@ -40,7 +40,7 @@ impl<T> ExporterService<T> {
 
     pub async fn run(&self) -> Result<(), Box<dyn std::error::Error>>
     where
-        T: DeserializeOwned,
+        T: DeserializeOwned + SetDefaults,
     {
         let config: T = self.config.config_client.read_config_from_file()?;
 

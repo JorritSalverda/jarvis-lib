@@ -4,6 +4,10 @@ use std::env;
 use std::error::Error;
 use std::fs;
 
+pub trait SetDefaults {
+  fn set_defaults(&mut self);
+}
+
 pub struct ConfigClientConfig {
     config_path: String,
 }
@@ -32,10 +36,12 @@ impl ConfigClient {
 
     pub fn read_config_from_file<T>(&self) -> Result<T, Box<dyn Error>>
     where
-        T: DeserializeOwned,
+        T: DeserializeOwned+SetDefaults,
     {
         let config_file_contents = fs::read_to_string(&self.config.config_path)?;
-        let config: T = serde_yaml::from_str(&config_file_contents)?;
+        let mut config: T = serde_yaml::from_str(&config_file_contents)?;
+
+        config.set_defaults();
 
         println!("Loaded config from {}", &self.config.config_path);
 
@@ -55,6 +61,11 @@ mod tests {
         pub location: String,
         pub entity_type: EntityType,
         pub entity_name: String,
+    }
+
+    impl SetDefaults for Config {
+      fn set_defaults(&mut self) {
+      }
     }
 
     #[test]
