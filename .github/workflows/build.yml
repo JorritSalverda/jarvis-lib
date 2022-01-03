@@ -40,6 +40,13 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: |
+          curl -sSL \
+            https://github.com/uber/prototool/releases/download/v1.10.0/prototool-$(uname -s)-$(uname -m) \
+            -o /usr/local/bin/prototool && \
+            chmod +x /usr/local/bin/prototool
+      - run: |
+          prototool lint
+      - run: |
           cargo build --verbose
           cargo clippy --no-deps -- --deny "warnings"
           cargo test --verbose

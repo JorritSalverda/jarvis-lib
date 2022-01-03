@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package jarvis.models.v1;
+
+import "jarvis/models/v1/sample.proto";
+import "google/protobuf/timestamp.proto";
+
+// Measurement consists of one or more Samples recorded at a specific time.
+message Measurement {
+  string id = 1;
+  string source = 2;
+  string location = 3;
+  repeated Sample samples = 4;
+  google.protobuf.Timestamp measured_at_time = 5;
+}

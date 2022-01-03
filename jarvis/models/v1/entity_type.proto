@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package jarvis.models.v1;
+
+// EntityType represents what type of entity is measured.
+enum EntityType {
+  ENTITY_TYPE_INVALID = 0;
+  ENTITY_TYPE_TARIFF = 1;
+  ENTITY_TYPE_ZONE = 2;
+  ENTITY_TYPE_DEVICE = 3;
+}

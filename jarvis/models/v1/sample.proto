@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package jarvis.models.v1;
+
+import "jarvis/models/v1/entity_type.proto";
+import "jarvis/models/v1/sample_type.proto";
+import "jarvis/models/v1/metric_type.proto";
+
+// Sample is a combination of EntityType, SampleType, MetricType and the measured value.
+message Sample {
+  EntityType entity_type = 1;
+  string entity_name = 2;
+  SampleType sample_type = 3;
+  string sample_name = 4;
+  MetricType metric_type = 5;
+  double value = 6;
+}

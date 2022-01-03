@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package jarvis.models.v1;
+
+// MetricType indicates whether the measurement is that of a counter or a gauge.
+enum MetricType {
+  METRIC_TYPE_INVALID = 0;
+  METRIC_TYPE_COUNTER = 1;
+  METRIC_TYPE_GAUGE = 2;
+}
