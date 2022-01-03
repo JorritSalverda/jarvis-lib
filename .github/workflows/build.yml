@@ -35,15 +35,15 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: |
-            ./target
-            /usr/local/cargo
-          key: ${{ hashFiles('Cargo.lock') }}
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: |
           cargo build --verbose
           cargo clippy --no-deps -- --deny "warnings"
           cargo test --verbose
-          ls -latr ./target
-          ls -latr /usr/local/cargo
+          ls -latr ~/.cargo target
 
   tag:
     runs-on: ubuntu-latest
