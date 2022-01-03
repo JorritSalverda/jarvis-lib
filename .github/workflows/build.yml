@@ -39,11 +39,11 @@ jobs:
             /usr/local/cargo
           key: ${{ hashFiles('Cargo.lock') }}
       - run: |
-        cargo build --verbose
-        cargo clippy --no-deps -- --deny "warnings"
-        cargo test --verbose
-        ls -latr ./target
-        ls -latr /usr/local/cargo
+          cargo build --verbose
+          cargo clippy --no-deps -- --deny "warnings"
+          cargo test --verbose
+          ls -latr ./target
+          ls -latr /usr/local/cargo
 
   tag:
     runs-on: ubuntu-latest
