@@ -41,9 +41,9 @@ impl StateClientConfig {
         let kube_client: kube::Client = Client::try_default().await?;
 
         let measurement_file_path = env::var("MEASUREMENT_FILE_PATH")
-            .unwrap_or("/configs/last-measurement.yaml".to_string());
+            .unwrap_or_else(|_| "/configs/last-measurement.yaml".to_string());
         let measurement_file_configmap_name = env::var("MEASUREMENT_FILE_CONFIG_MAP_NAME")
-            .unwrap_or("jarvis-modbus-exporter".to_string());
+            .unwrap_or_else(|_| "jarvis-modbus-exporter".to_string());
 
         let current_namespace =
             fs::read_to_string("/var/run/secrets/kubernetes.io/serviceaccount/namespace")?;
@@ -113,7 +113,7 @@ impl StateClient {
             .replace(
                 &self.config.measurement_file_configmap_name,
                 &PostParams::default(),
-                &config_map,
+                config_map,
             )
             .await?;
 

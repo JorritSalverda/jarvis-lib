@@ -49,16 +49,16 @@ impl BigqueryClientConfig {
 
     pub async fn from_env() -> Result<Self, Box<dyn Error>> {
         let google_application_credentials = env::var("GOOGLE_APPLICATION_CREDENTIALS")
-            .unwrap_or(String::from("/secrets/keyfile.json"));
+            .unwrap_or_else(|_| String::from("/secrets/keyfile.json"));
         let project_id = env::var("BQ_PROJECT_ID")?;
         let dataset = env::var("BQ_DATASET")?;
         let table = env::var("BQ_TABLE")?;
         let enable: bool = env::var("BQ_ENABLE")
-            .unwrap_or("true".to_string())
+            .unwrap_or_else(|_| "true".to_string())
             .parse()
             .unwrap_or(true);
         let init: bool = env::var("BQ_INIT")
-            .unwrap_or("true".to_string())
+            .unwrap_or_else(|_| "true".to_string())
             .parse()
             .unwrap_or(true);
 
@@ -88,7 +88,7 @@ impl BigqueryClient {
             return false;
         }
 
-        return match &self
+        return self
             .config
             .client
             .table()
@@ -99,10 +99,7 @@ impl BigqueryClient {
                 None,
             )
             .await
-        {
-            Ok(_) => true,
-            Err(_) => false,
-        };
+            .is_ok();
     }
 
     pub async fn create_table(&self, wait_ready: bool) -> Result<(), Box<dyn Error>> {
@@ -121,7 +118,7 @@ impl BigqueryClient {
             .create_table(
                 &self.config.client,
                 Table::from_dataset(
-                    &dataset,
+                    dataset,
                     &self.config.table,
                     TableSchema::new(vec![
                         TableFieldSchema::string("ID"),
@@ -184,7 +181,7 @@ impl BigqueryClient {
                 &self.config.dataset,
                 &self.config.table,
                 Table::from_dataset(
-                    &dataset,
+                    dataset,
                     &self.config.table,
                     TableSchema::new(vec![
                         TableFieldSchema::string("ID"),

@@ -19,7 +19,7 @@ impl ConfigClientConfig {
     }
 
     pub fn from_env() -> Result<Self, Box<dyn Error>> {
-        let config_path = env::var("CONFIG_PATH").unwrap_or("/configs/config.yaml".to_string());
+        let config_path = env::var("CONFIG_PATH").unwrap_or_else(|_| "/configs/config.yaml".to_string());
 
         Self::new(config_path)
     }
