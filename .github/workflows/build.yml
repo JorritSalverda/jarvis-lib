@@ -40,7 +40,7 @@ jobs:
       - run: |
           cargo install protobuf-codegen
       - run: prototool lint proto
-      - run: prototool break proto
+      - run: prototool break check proto
       - run: prototool generate proto
 
   build:
