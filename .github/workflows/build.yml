@@ -20,6 +20,29 @@ jobs:
       - id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.7
 
+  proto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: 1.57
+            default: true
+      - run: |
+          apt-get install protobuf-compiler
+      - run: |
+          curl -sSL \
+            https://github.com/uber/prototool/releases/download/v1.10.0/prototool-$(uname -s)-$(uname -m) \
+            -o /usr/local/bin/prototool && \
+            chmod +x /usr/local/bin/prototool
+      - run: |
+          cargo install protobuf-codegen
+      - run: prototool lint proto
+      - run: prototool break proto
+      - run: prototool generate proto
+
   build:
     runs-on: ubuntu-latest
     needs: gitversion
@@ -39,11 +62,6 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - run: |
-          curl -sSL \
-            https://github.com/uber/prototool/releases/download/v1.10.0/prototool-$(uname -s)-$(uname -m) \
-            -o /usr/local/bin/prototool && \
-            chmod +x /usr/local/bin/prototool
       - run: |
           prototool lint
       - run: |

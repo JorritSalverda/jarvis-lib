@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package jarvis.models.v1;
 
+import "rustproto/rustproto.proto";
+
+option (rustproto.serde_derive_all) = true;
+
 // MetricType indicates whether the measurement is that of a counter or a gauge.
 enum MetricType {
   METRIC_TYPE_INVALID = 0;

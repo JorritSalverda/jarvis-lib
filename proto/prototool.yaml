@@ -13,3 +13,13 @@ lint:
     - FILE_OPTIONS_REQUIRE_CSHARP_NAMESPACE
     - FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
     - FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+  ignores:
+    - id: PACKAGE_MAJOR_BETA_VERSIONED
+      files:
+        - rustproto/rustproto.proto
+
+generate:
+  plugins:
+    - name: rust
+      output: ../src/model
+      path: protoc-gen-rust

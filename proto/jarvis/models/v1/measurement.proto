@@ -4,6 +4,9 @@ package jarvis.models.v1;
 
 import "jarvis/models/v1/sample.proto";
 import "google/protobuf/timestamp.proto";
+import "rustproto/rustproto.proto";
+
+option (rustproto.serde_derive_all) = true;
 
 // Measurement consists of one or more Samples recorded at a specific time.
 message Measurement {

@@ -166,7 +166,7 @@ impl StateClient {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{EntityType, MetricType, SampleType};
+    use crate::model::{EntityType,MetricType,SampleType};
     use chrono::DateTime;
 
     #[tokio::test]

@@ -5,6 +5,9 @@ package jarvis.models.v1;
 import "jarvis/models/v1/entity_type.proto";
 import "jarvis/models/v1/sample_type.proto";
 import "jarvis/models/v1/metric_type.proto";
+import "rustproto/rustproto.proto";
+
+option (rustproto.serde_derive_all) = true;
 
 // Sample is a combination of EntityType, SampleType, MetricType and the measured value.
 message Sample {
