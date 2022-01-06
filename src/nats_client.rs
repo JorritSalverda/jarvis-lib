@@ -45,29 +45,36 @@ impl NatsClientConfig {
 
 pub struct NatsClient {
   config: NatsClientConfig,
+  connection: Option<nats::Connection>
 }
 
 impl NatsClient {
   pub fn new(config: NatsClientConfig) -> NatsClient {
-    NatsClient { config }
+    NatsClient { config, connection: None }
   }
 
-  pub fn queue_subscribe(&self) -> Result<nats::Subscription, Box<dyn Error>> {
-    println!("Subscribing to nats subject {} for queue {}", &self.config.subject, &self.config.queue);
-
-    let nc = nats::connect(&self.config.host).unwrap_or_else(|_| panic!("Failed to connect to nats at {}", &self.config.host));
+  fn connect(&mut self) -> Result<(), Box<dyn Error>> {
+    self.connection = Some(nats::connect(&self.config.host).unwrap_or_else(|_| panic!("Failed to connect to nats at {}", &self.config.host)));
     
-    Ok(nc.queue_subscribe(&self.config.subject, &self.config.queue).unwrap_or_else(|_| panic!("Failed to subscribe to nats subject {} for queue {}", &self.config.subject, &self.config.queue)))
+    Ok(())
   }
 
-  pub fn publish(&self, measurement: &Measurement) -> Result<(), Box<dyn Error>> {
-    println!("Publishing measurement to nats subject {}", &self.config.subject);
+  pub fn queue_subscribe(&mut self) -> Result<nats::Subscription, Box<dyn Error>> {
+    println!("Subscribing to nats subject {} for queue {}", &self.config.subject, &self.config.queue);
+    
+    self.connect()?;
+    
+    Ok(self.connection.as_ref().unwrap().queue_subscribe(&self.config.subject, &self.config.queue).unwrap_or_else(|_| panic!("Failed to subscribe to nats subject {} for queue {}", &self.config.subject, &self.config.queue)))
+  }
 
-    let nc = nats::connect(&self.config.host).unwrap_or_else(|_| panic!("Failed to connect to nats at {}", &self.config.host));
+  pub fn publish(&mut self, measurement: &Measurement) -> Result<(), Box<dyn Error>> {
+    println!("Publishing measurement to nats subject {}", &self.config.subject);
+    
+    self.connect()?;
 
     let msg = serde_json::to_vec(measurement).expect("Failed to serialize measurement");
 
-    nc.publish(&self.config.subject, msg).unwrap_or_else(|_| panic!("Failed to publish measurement to nats subject {}", &self.config.subject));
+    self.connection.as_ref().unwrap().publish(&self.config.subject, msg).unwrap_or_else(|_| panic!("Failed to publish measurement to nats subject {}", &self.config.subject));
 
     Ok(())
   }

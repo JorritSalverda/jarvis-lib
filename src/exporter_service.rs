@@ -38,7 +38,7 @@ impl<T> ExporterService<T> {
         Self { config }
     }
 
-    pub async fn run(&self) -> Result<(), Box<dyn std::error::Error>>
+    pub async fn run(&mut self) -> Result<(), Box<dyn std::error::Error>>
     where
         T: DeserializeOwned + SetDefaults,
     {
