@@ -53,14 +53,18 @@ impl NatsClient {
   }
 
   pub fn queue_subscribe(&self) -> Result<nats::Subscription, Box<dyn Error>> {
-    let nc = nats::connect(&self.config.host)?;
+    let nc = nats::connect(&self.config.host).unwrap_or_else(|_| panic!("Failed to connect to nats at {}", &self.config.host));
     
-    Ok(nc.queue_subscribe(&self.config.subject, &self.config.queue)?)
+    Ok(nc.queue_subscribe(&self.config.subject, &self.config.queue).unwrap_or_else(|_| panic!("Failed to subscribe to subject {} for queue {}", &self.config.subject, &self.config.queue)))
   }
 
   pub fn publish(&self, measurement: &Measurement) -> Result<(), Box<dyn Error>> {
-    let nc = nats::connect(&self.config.host)?;
+    let nc = nats::connect(&self.config.host).unwrap_or_else(|_| panic!("Failed to connect to nats at {}", &self.config.host));
 
-    Ok(nc.publish(&self.config.subject, serde_json::to_vec(measurement)?)?)
+    let msg = serde_json::to_vec(measurement).expect("Failed to serialize measurement");
+
+    nc.publish(&self.config.subject, msg).unwrap_or_else(|_| panic!("Failed to publish measurement to nats subject {}", &self.config.subject));
+
+    Ok(())
   }
 }
