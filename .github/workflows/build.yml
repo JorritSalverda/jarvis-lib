@@ -52,8 +52,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
-            toolchain: 1.60
-            default: true
+            toolchain: stable
             components: rustfmt, clippy
       - uses: actions/cache@v2
         with:
@@ -63,6 +62,7 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: |
+          cargo version --verbose
           cargo build --verbose
           cargo clippy --no-deps -- --deny "warnings"
           cargo test --verbose
