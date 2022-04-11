@@ -67,6 +67,10 @@ impl StateClient {
         StateClient { config }
     }
 
+    pub async fn from_env() -> Result<Self, Box<dyn Error>> {
+        Ok(Self::new(StateClientConfig::from_env().await?))
+    }
+
     pub fn read_state(&self) -> Result<Option<Measurement>, Box<dyn std::error::Error>> {
         let state_file_contents = match fs::read_to_string(&self.config.measurement_file_path) {
             Ok(c) => c,
@@ -166,7 +170,7 @@ impl StateClient {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{EntityType,MetricType,SampleType};
+    use crate::model::{EntityType, MetricType, SampleType};
     use chrono::DateTime;
 
     #[tokio::test]

@@ -1,8 +1,8 @@
 use std::error::Error;
 
-use crate::nats_client::NatsClient;
-use crate::config_client::{ConfigClient,SetDefaults};
+use crate::config_client::{ConfigClient, SetDefaults};
 use crate::measurement_client::MeasurementClient;
+use crate::nats_client::NatsClient;
 use crate::state_client::StateClient;
 use serde::de::DeserializeOwned;
 
@@ -51,9 +51,7 @@ impl<T> ExporterService<T> {
             .measurement_client
             .get_measurement(config, last_measurement)?;
 
-        self.config
-            .nats_client
-            .publish(&measurement)?;
+        self.config.nats_client.publish(&measurement)?;
 
         self.config.state_client.store_state(&measurement).await?;
 

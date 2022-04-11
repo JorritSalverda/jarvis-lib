@@ -5,7 +5,7 @@ use std::error::Error;
 use std::fs;
 
 pub trait SetDefaults {
-  fn set_defaults(&mut self);
+    fn set_defaults(&mut self);
 }
 
 pub struct ConfigClientConfig {
@@ -19,7 +19,8 @@ impl ConfigClientConfig {
     }
 
     pub fn from_env() -> Result<Self, Box<dyn Error>> {
-        let config_path = env::var("CONFIG_PATH").unwrap_or_else(|_| "/configs/config.yaml".to_string());
+        let config_path =
+            env::var("CONFIG_PATH").unwrap_or_else(|_| "/configs/config.yaml".to_string());
 
         Self::new(config_path)
     }
@@ -36,7 +37,7 @@ impl ConfigClient {
 
     pub fn read_config_from_file<T>(&self) -> Result<T, Box<dyn Error>>
     where
-        T: DeserializeOwned+SetDefaults,
+        T: DeserializeOwned + SetDefaults,
     {
         let config_file_contents = fs::read_to_string(&self.config.config_path)?;
         let mut config: T = serde_yaml::from_str(&config_file_contents)?;
@@ -64,8 +65,7 @@ mod tests {
     }
 
     impl SetDefaults for Config {
-      fn set_defaults(&mut self) {
-      }
+        fn set_defaults(&mut self) {}
     }
 
     #[test]

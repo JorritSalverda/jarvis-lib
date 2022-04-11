@@ -1,5 +1,5 @@
+use crate::model::{EntityType, MetricType, SampleType};
 use serde::{Deserialize, Serialize};
-use crate::model::{EntityType, SampleType, MetricType};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]

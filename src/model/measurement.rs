@@ -1,6 +1,6 @@
+use crate::model::Sample;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use crate::model::Sample;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
