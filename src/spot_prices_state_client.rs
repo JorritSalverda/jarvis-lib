@@ -1,14 +1,7 @@
-use crate::types::*;
-use k8s_openapi::api::core::v1::ConfigMap;
-use kube::{
-    api::{Api, PostParams},
-    Client,
-};
-use std::collections::BTreeMap;
+use crate::model::*;
 use std::env;
 use std::error::Error;
 use std::fs;
-use std::path::Path;
 
 pub struct SpotPricesStateClientConfig {
     state_file_path: String,
@@ -47,10 +40,6 @@ impl SpotPricesStateClient {
     }
 
     pub fn read_state(&self) -> Result<Option<SpotPricesState>, Box<dyn std::error::Error>> {
-        if !self.config.enable {
-            return Ok(None);
-        }
-
         let state_file_contents = match fs::read_to_string(&self.config.state_file_path) {
             Ok(c) => c,
             Err(_) => return Ok(Option::None),

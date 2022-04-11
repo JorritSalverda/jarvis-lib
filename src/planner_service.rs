@@ -1,9 +1,8 @@
 use std::error::Error;
 
 use crate::config_client::{ConfigClient, SetDefaults};
-use crate::measurement_client::MeasurementClient;
-use crate::nats_client::NatsClient;
-use crate::state_client::StateClient;
+use crate::planner_client::PlannerClient;
+use crate::spot_prices_state_client::SpotPricesStateClient;
 use serde::de::DeserializeOwned;
 
 pub struct PlannerServiceConfig<T: ?Sized> {
@@ -20,7 +19,7 @@ impl<T> PlannerServiceConfig<T> {
     ) -> Result<Self, Box<dyn Error>> {
         Ok(Self {
             config_client,
-            state_client,
+            spot_prices_state_client,
             planner_client,
         })
     }
@@ -41,7 +40,7 @@ impl<T> PlannerService<T> {
     {
         let config: T = self.config.config_client.read_config_from_file()?;
 
-        let spot_prices_state = self.config.state_client.read_state()?;
+        let spot_prices_state = self.config.spot_prices_state_client.read_state()?;
 
         self.config.planner_client.plan(config, spot_prices_state)?;
 

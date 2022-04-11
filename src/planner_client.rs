@@ -1,4 +1,4 @@
-use crate::model::Measurement;
+use crate::model::SpotPricesState;
 use serde::de::DeserializeOwned;
 use std::error::Error;
 
