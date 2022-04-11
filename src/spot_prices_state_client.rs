@@ -18,7 +18,7 @@ impl SpotPricesStateClientConfig {
 
     pub async fn from_env() -> Result<Self, Box<dyn Error>> {
         let state_file_path =
-            env::var("STATE_FILE_PATH").unwrap_or_else(|_| "/configs/state.yaml".to_string());
+            env::var("STATE_FILE_PATH").unwrap_or_else(|_| "/state/state.yaml".to_string());
 
         Self::new(
             &state_file_path,
