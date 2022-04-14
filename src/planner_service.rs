@@ -6,6 +6,7 @@ use crate::planner_client::PlannerClient;
 use crate::spot_prices_state_client::SpotPricesStateClient;
 use chrono::prelude::*;
 use chrono::Duration;
+use chrono::TimeZone;
 use serde::de::DeserializeOwned;
 
 pub struct PlannerServiceConfig<T: ?Sized> {
@@ -62,20 +63,19 @@ async fn get_plannable_spot_prices(
     spot_prices: Vec<SpotPrice>,
     planner_config: &SpotPricePlannerConfig,
 ) -> Result<Vec<SpotPrice>, Box<dyn Error>> {
-    if spot_prices.is_empty() {
-        Ok(vec![])
-    } else {
-        // filter spot prices down to plannable time slots
-        let mut plannable_spot_prices: Vec<SpotPrice> = vec![];
-        for spot_price in spot_prices.into_iter() {
-            let local_from: DateTime<Local> = DateTime::from(spot_price.from);
-            let local_till: DateTime<Local> = DateTime::from(spot_price.till);
+    let time_zone = planner_config.get_time_zone()?;
+
+    Ok(spot_prices
+        .into_iter()
+        .filter(|spot_price| {
+            let local_from = spot_price.from.with_timezone(&time_zone);
+            let local_till = spot_price.till.with_timezone(&time_zone);
 
             if let Some(plannable_local_time_slots) = planner_config
                 .plannable_local_time_slots
                 .get(&local_from.weekday())
             {
-                for time_slot in plannable_local_time_slots {
+                return plannable_local_time_slots.iter().any(|time_slot| {
                     let time_slot_from = Local
                         .ymd(local_from.year(), local_from.month(), local_from.day())
                         .and_hms(
@@ -83,38 +83,36 @@ async fn get_plannable_spot_prices(
                             time_slot.from.minute(),
                             time_slot.from.second(),
                         );
-                    let mut time_slot_till = Local
-                        .ymd(local_from.year(), local_from.month(), local_from.day())
-                        .and_hms(
-                            time_slot.till.hour(),
-                            time_slot.till.minute(),
-                            time_slot.till.second(),
-                        );
-                    if time_slot.till.hour() == 0 {
+
+                    let time_slot_till = if time_slot.till.hour() > 0 {
+                        Local
+                            .ymd(local_from.year(), local_from.month(), local_from.day())
+                            .and_hms(
+                                time_slot.till.hour(),
+                                time_slot.till.minute(),
+                                time_slot.till.second(),
+                            )
+                    } else {
                         let next_day = local_from.date() + Duration::days(1);
-                        time_slot_till = Local
+                        Local
                             .ymd(next_day.year(), next_day.month(), next_day.day())
                             .and_hms(
                                 time_slot.till.hour(),
                                 time_slot.till.minute(),
                                 time_slot.till.second(),
-                            );
-                    }
+                            )
+                    };
 
-                    if local_from >= time_slot_from
+                    local_from >= time_slot_from
                         && local_from < time_slot_till
                         && local_till > time_slot_from
                         && local_till <= time_slot_till
-                    {
-                        plannable_spot_prices.push(spot_price);
-                        break;
-                    }
-                }
+                });
             }
-        }
 
-        Ok(plannable_spot_prices)
-    }
+            false
+        })
+        .collect())
 }
 
 async fn get_best_spot_prices(
@@ -210,6 +208,7 @@ mod tests {
                 }],
             )]),
             session_minutes: Some(120),
+            time_zone: "Europe/Amsterdam".to_string(),
         };
 
         let plannable_spot_prices = get_plannable_spot_prices(spot_prices, &planner_config).await?;
@@ -326,6 +325,7 @@ mod tests {
                 ),
             ]),
             session_minutes: Some(120),
+            time_zone: "Europe/Amsterdam".to_string(),
         };
 
         let plannable_spot_prices = get_plannable_spot_prices(spot_prices, &planner_config).await?;
@@ -445,6 +445,7 @@ mod tests {
                 ),
             ]),
             session_minutes: Some(120),
+            time_zone: "Europe/Amsterdam".to_string(),
         };
 
         let best_spot_prices = get_best_spot_prices(spot_prices, planner_config).await?;

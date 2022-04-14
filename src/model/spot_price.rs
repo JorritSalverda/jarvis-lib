@@ -1,6 +1,8 @@
 use chrono::{naive::NaiveTime, DateTime, Utc, Weekday};
+use chrono_tz::Tz;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::error::Error;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -77,6 +79,13 @@ pub struct SpotPricePlannerConfig {
     pub planning_strategy: PlanningStrategy,
     pub plannable_local_time_slots: HashMap<Weekday, Vec<TimeSlot>>,
     pub session_minutes: Option<u32>,
+    pub time_zone: String,
+}
+
+impl SpotPricePlannerConfig {
+    pub fn get_time_zone(&self) -> Result<Tz, Box<dyn Error>> {
+        Ok(self.time_zone.parse::<Tz>()?)
+    }
 }
 
 #[cfg(test)]
