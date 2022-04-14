@@ -1,3 +1,4 @@
+use crate::model::*;
 use serde::de::DeserializeOwned;
 use serde_yaml;
 use std::env;
@@ -48,12 +49,23 @@ impl ConfigClient {
 
         Ok(config)
     }
+
+    pub fn read_planner_config_from_file(&self) -> Result<SpotPricePlannerConfig, Box<dyn Error>> {
+        let config_file_contents = fs::read_to_string(&self.config.config_path)?;
+        let config: SpotPricePlannerConfig = serde_yaml::from_str(&config_file_contents)?;
+
+        println!("Loaded planner config from {}", &self.config.config_path);
+
+        Ok(config)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::model::EntityType;
+    use chrono::naive::NaiveTime;
+    use chrono::Weekday;
     use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Debug)]
@@ -78,5 +90,83 @@ mod tests {
         assert_eq!(config.location, "My Home".to_string());
         assert_eq!(config.entity_type, EntityType::Device);
         assert_eq!(config.entity_name, "TP-Link HS110".to_string());
+    }
+
+    #[test]
+    fn read_planner_config_from_file_returns_deserialized_test_file() {
+        let config_client =
+            ConfigClient::new(ConfigClientConfig::new("test-config.yaml".to_string()).unwrap());
+
+        let config: SpotPricePlannerConfig = config_client.read_planner_config_from_file().unwrap();
+
+        assert_eq!(config.planning_strategy, PlanningStrategy::Fragmented);
+
+        assert_eq!(config.plannable_local_time_slots.len(), 2);
+        assert_eq!(config.session_minutes.unwrap(), 75);
+        assert_eq!(
+            config
+                .plannable_local_time_slots
+                .get(&Weekday::Thu)
+                .unwrap()
+                .len(),
+            2
+        );
+        assert_eq!(
+            config
+                .plannable_local_time_slots
+                .get(&Weekday::Thu)
+                .unwrap()[0]
+                .from,
+            NaiveTime::from_hms(0, 0, 0)
+        );
+        assert_eq!(
+            config
+                .plannable_local_time_slots
+                .get(&Weekday::Thu)
+                .unwrap()[0]
+                .till,
+            NaiveTime::from_hms(7, 0, 0)
+        );
+        assert_eq!(
+            config
+                .plannable_local_time_slots
+                .get(&Weekday::Thu)
+                .unwrap()[1]
+                .from,
+            NaiveTime::from_hms(23, 0, 0)
+        );
+        assert_eq!(
+            config
+                .plannable_local_time_slots
+                .get(&Weekday::Thu)
+                .unwrap()[1]
+                .till,
+            NaiveTime::from_hms(0, 0, 0)
+        );
+
+        assert_eq!(
+            config
+                .plannable_local_time_slots
+                .get(&Weekday::Sat)
+                .unwrap()
+                .len(),
+            1
+        );
+        assert_eq!(
+            config
+                .plannable_local_time_slots
+                .get(&Weekday::Sat)
+                .unwrap()[0]
+                .from,
+            NaiveTime::from_hms(0, 0, 0)
+        );
+        assert_eq!(
+            config
+                .plannable_local_time_slots
+                .get(&Weekday::Sat)
+                .unwrap()[0]
+                .till,
+            NaiveTime::from_hms(0, 0, 0)
+        );
     }
 }

@@ -8,9 +8,7 @@ pub struct SpotPricesStateClientConfig {
 }
 
 impl SpotPricesStateClientConfig {
-    pub fn new(
-        state_file_path: &str,
-    ) -> Result<Self, Box<dyn Error>> {
+    pub fn new(state_file_path: &str) -> Result<Self, Box<dyn Error>> {
         Ok(Self {
             state_file_path: state_file_path.into(),
         })
@@ -20,9 +18,7 @@ impl SpotPricesStateClientConfig {
         let state_file_path =
             env::var("STATE_FILE_PATH").unwrap_or_else(|_| "/state/state.yaml".to_string());
 
-        Self::new(
-            &state_file_path,
-        )
+        Self::new(&state_file_path)
     }
 }
 

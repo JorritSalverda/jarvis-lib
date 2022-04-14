@@ -1,5 +1,6 @@
-use chrono::{DateTime, Utc};
+use chrono::{naive::NaiveTime, DateTime, Utc, Weekday};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -41,11 +42,41 @@ pub struct SpotPrice {
     pub energy_tax_price: f64,
 }
 
+impl SpotPrice {
+    pub fn total_price(&self) -> f64 {
+        self.market_price
+            + self.market_price_tax
+            + self.sourcing_markup_price
+            + self.energy_tax_price
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct SpotPricesState {
     pub future_spot_prices: Vec<SpotPrice>,
     pub last_from: DateTime<Utc>,
+}
+
+#[derive(Copy, Clone, PartialEq, Serialize, Deserialize, Debug)]
+pub enum PlanningStrategy {
+    Consecutive,
+    Fragmented,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct TimeSlot {
+    pub from: NaiveTime,
+    pub till: NaiveTime,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct SpotPricePlannerConfig {
+    pub planning_strategy: PlanningStrategy,
+    pub plannable_local_time_slots: HashMap<Weekday, Vec<TimeSlot>>,
+    pub session_minutes: Option<u32>,
 }
 
 #[cfg(test)]

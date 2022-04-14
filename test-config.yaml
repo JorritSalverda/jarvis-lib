@@ -1,3 +1,17 @@
+# client specific config
 location: My Home
 entityType: ENTITY_TYPE_DEVICE
 entityName: TP-Link HS110
+
+# planner config
+planningStrategy: Fragmented
+plannableLocalTimeSlots:
+  Thu:
+    - from: 0:00:00
+      till: 7:00:00
+    - from: 23:00:00
+      till: 0:00:00
+  Sat:
+    - from: 0:00:00
+      till: 0:00:00
+sessionMinutes: 75
