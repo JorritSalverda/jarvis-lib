@@ -1,13 +1,10 @@
-use std::error::Error;
-
 use crate::config_client::{ConfigClient, SetDefaults};
 use crate::model::*;
 use crate::planner_client::PlannerClient;
 use crate::spot_prices_state_client::SpotPricesStateClient;
-use chrono::prelude::*;
-use chrono::Duration;
-use chrono::TimeZone;
+use chrono::{prelude::*, Duration, TimeZone};
 use serde::de::DeserializeOwned;
+use std::error::Error;
 
 pub struct PlannerServiceConfig<T: ?Sized> {
     config_client: ConfigClient,
@@ -76,7 +73,7 @@ async fn get_plannable_spot_prices(
                 .get(&local_from.weekday())
             {
                 return plannable_local_time_slots.iter().any(|time_slot| {
-                    let time_slot_from = Local
+                    let time_slot_from = time_zone
                         .ymd(local_from.year(), local_from.month(), local_from.day())
                         .and_hms(
                             time_slot.from.hour(),
@@ -85,7 +82,7 @@ async fn get_plannable_spot_prices(
                         );
 
                     let time_slot_till = if time_slot.till.hour() > 0 {
-                        Local
+                        time_zone
                             .ymd(local_from.year(), local_from.month(), local_from.day())
                             .and_hms(
                                 time_slot.till.hour(),
@@ -94,7 +91,7 @@ async fn get_plannable_spot_prices(
                             )
                     } else {
                         let next_day = local_from.date() + Duration::days(1);
-                        Local
+                        time_zone
                             .ymd(next_day.year(), next_day.month(), next_day.day())
                             .and_hms(
                                 time_slot.till.hour(),
