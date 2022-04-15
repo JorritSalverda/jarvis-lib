@@ -35,7 +35,7 @@ impl<T> PlannerService<T> {
         Self { config }
     }
 
-    pub async fn run(&mut self) -> Result<(), Box<dyn Error>>
+    pub async fn run(&self) -> Result<(), Box<dyn Error>>
     where
         T: DeserializeOwned + SetDefaults,
     {
