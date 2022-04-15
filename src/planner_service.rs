@@ -111,29 +111,37 @@ pub async fn get_best_spot_prices(
 ) -> Result<Vec<SpotPrice>, Box<dyn Error>> {
     let mut plannable_spot_prices = get_plannable_spot_prices(spot_prices, &planner_config).await?;
 
-    // sort from lowest prices to highest
-    plannable_spot_prices.sort_by(|a, b| a.total_price().partial_cmp(&b.total_price()).unwrap());
+    match planner_config.planning_strategy {
+        PlanningStrategy::Fragmented => {
+            // sort from lowest prices to highest
+            plannable_spot_prices
+                .sort_by(|a, b| a.total_price().partial_cmp(&b.total_price()).unwrap());
 
-    if let Some(mins) = planner_config.session_minutes {
-        // get enough spot prices for session duration
-        let mut spot_price_duration_selected: i64 = 0;
-        let mut selected_spot_prices: Vec<SpotPrice> = vec![];
-        for spot_price in plannable_spot_prices.into_iter() {
-            if spot_price_duration_selected < i64::from(mins) {
-                let spot_price_duration = spot_price.till - spot_price.from;
+            if let Some(mins) = planner_config.session_minutes {
+                // get enough spot prices for session duration
+                let mut spot_price_duration_selected: i64 = 0;
+                let mut selected_spot_prices: Vec<SpotPrice> = vec![];
+                for spot_price in plannable_spot_prices.into_iter() {
+                    if spot_price_duration_selected < i64::from(mins) {
+                        let spot_price_duration = spot_price.till - spot_price.from;
 
-                spot_price_duration_selected += spot_price_duration.num_minutes();
-                selected_spot_prices.push(spot_price);
+                        spot_price_duration_selected += spot_price_duration.num_minutes();
+                        selected_spot_prices.push(spot_price);
+                    }
+                }
+
+                // sort by time
+                selected_spot_prices.sort_by(|a, b| a.from.cmp(&b.from));
+
+                Ok(selected_spot_prices)
+            } else {
+                Ok(plannable_spot_prices)
             }
         }
-
-        // sort by time
-        selected_spot_prices.sort_by(|a, b| a.from.cmp(&b.from));
-
-        Ok(selected_spot_prices)
-    } else {
-        // Ok(plannable_spot_prices.first().to_vec())
-        Ok(plannable_spot_prices)
+        PlanningStrategy::Consecutive => {
+            // todo pick consecutive spots that together have lowest price
+            Ok(plannable_spot_prices)
+        }
     }
 }
 
