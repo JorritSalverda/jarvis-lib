@@ -79,12 +79,12 @@ pub struct SpotPricePlannerConfig {
     pub planning_strategy: PlanningStrategy,
     pub plannable_local_time_slots: HashMap<Weekday, Vec<TimeSlot>>,
     pub session_minutes: Option<u32>,
-    pub time_zone: String,
+    pub local_time_zone: String,
 }
 
 impl SpotPricePlannerConfig {
-    pub fn get_time_zone(&self) -> Result<Tz, Box<dyn Error>> {
-        Ok(self.time_zone.parse::<Tz>()?)
+    pub fn get_local_time_zone(&self) -> Result<Tz, Box<dyn Error>> {
+        Ok(self.local_time_zone.parse::<Tz>()?)
     }
 }
 
