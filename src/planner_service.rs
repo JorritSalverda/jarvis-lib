@@ -56,7 +56,7 @@ impl<T> PlannerService<T> {
     }
 }
 
-async fn get_plannable_spot_prices(
+pub async fn get_plannable_spot_prices(
     spot_prices: Vec<SpotPrice>,
     planner_config: &SpotPricePlannerConfig,
 ) -> Result<Vec<SpotPrice>, Box<dyn Error>> {
@@ -105,7 +105,7 @@ async fn get_plannable_spot_prices(
         .collect())
 }
 
-async fn get_best_spot_prices(
+pub async fn get_best_spot_prices(
     spot_prices: Vec<SpotPrice>,
     planner_config: SpotPricePlannerConfig,
 ) -> Result<Vec<SpotPrice>, Box<dyn Error>> {
