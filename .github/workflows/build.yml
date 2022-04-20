@@ -62,10 +62,10 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: |
-          cargo version
           cargo build
           cargo clippy --no-deps -- --deny "warnings"
           cargo test
+          cargo version
 
   tag:
     runs-on: ubuntu-latest

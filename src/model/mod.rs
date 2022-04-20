@@ -4,6 +4,7 @@ mod metric_type;
 mod sample;
 mod sample_type;
 mod spot_price;
+mod spot_price_planner;
 
 pub use crate::model::entity_type::EntityType;
 pub use crate::model::measurement::Measurement;
@@ -11,6 +12,7 @@ pub use crate::model::metric_type::MetricType;
 pub use crate::model::sample::Sample;
 pub use crate::model::sample_type::SampleType;
 pub use crate::model::spot_price::*;
+pub use crate::model::spot_price_planner::SpotPricePlanner;
 
 #[cfg(test)]
 mod tests {
