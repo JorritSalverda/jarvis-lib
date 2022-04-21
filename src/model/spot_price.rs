@@ -78,7 +78,7 @@ pub struct TimeSlot {
 pub struct SpotPricePlannerConfig {
     pub planning_strategy: PlanningStrategy,
     pub plannable_local_time_slots: HashMap<Weekday, Vec<TimeSlot>>,
-    pub session_minutes: Option<u32>,
+    pub session_duration_in_seconds: Option<u32>,
     pub local_time_zone: String,
 }
 

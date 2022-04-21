@@ -14,5 +14,5 @@ plannableLocalTimeSlots:
   Sat:
     - from: 0:00:00
       till: 0:00:00
-sessionMinutes: 75
+sessionDurationInSeconds: 4500
 localTimeZone: Europe/Amsterdam

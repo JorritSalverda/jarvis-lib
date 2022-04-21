@@ -102,7 +102,7 @@ mod tests {
         assert_eq!(config.planning_strategy, PlanningStrategy::Fragmented);
 
         assert_eq!(config.plannable_local_time_slots.len(), 2);
-        assert_eq!(config.session_minutes.unwrap(), 75);
+        assert_eq!(config.session_duration_in_seconds.unwrap(), 4500);
         assert_eq!(
             config
                 .plannable_local_time_slots

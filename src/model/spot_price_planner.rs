@@ -1,5 +1,6 @@
 use crate::model::spot_price::*;
 use chrono::{prelude::*, Duration};
+use log::debug;
 use std::error::Error;
 
 pub struct SpotPricePlanner {
@@ -52,15 +53,15 @@ impl SpotPricePlanner {
                         };
 
                         if let Some(b) = before {
-                          if spot_price.from < b {
-                            return false;
-                          }
+                            if spot_price.from < b {
+                                return false;
+                            }
                         }
 
                         if let Some(a) = after {
-                          if spot_price.till > a {
-                            return false;
-                          }
+                            if spot_price.till > a {
+                                return false;
+                            }
                         }
 
                         local_from >= time_slot_from
@@ -82,8 +83,9 @@ impl SpotPricePlanner {
         after: Option<DateTime<Utc>>,
         before: Option<DateTime<Utc>>,
     ) -> Result<Vec<SpotPrice>, Box<dyn Error>> {
-        let mut plannable_spot_prices: Vec<SpotPrice> =
-            self.get_plannable_spot_prices(spot_prices, after, before).await?;
+        let mut plannable_spot_prices: Vec<SpotPrice> = self
+            .get_plannable_spot_prices(spot_prices, after, before)
+            .await?;
 
         match self.config.planning_strategy {
             PlanningStrategy::Fragmented => {
@@ -91,15 +93,15 @@ impl SpotPricePlanner {
                 plannable_spot_prices
                     .sort_by(|a, b| a.total_price().partial_cmp(&b.total_price()).unwrap());
 
-                if let Some(mins) = self.config.session_minutes {
+                if let Some(seconds) = self.config.session_duration_in_seconds {
                     // get enough spot prices for session duration
                     let mut spot_price_duration_selected: i64 = 0;
                     let mut selected_spot_prices: Vec<SpotPrice> = vec![];
                     for spot_price in plannable_spot_prices.into_iter() {
-                        if spot_price_duration_selected < i64::from(mins) {
+                        if spot_price_duration_selected < i64::from(seconds) {
                             let spot_price_duration = spot_price.till - spot_price.from;
 
-                            spot_price_duration_selected += spot_price_duration.num_minutes();
+                            spot_price_duration_selected += spot_price_duration.num_seconds();
                             selected_spot_prices.push(spot_price);
                         }
                     }
@@ -114,26 +116,32 @@ impl SpotPricePlanner {
             }
             PlanningStrategy::Consecutive => {
                 // pick consecutive spot prices that together have lowest price
-                if let Some(mins) = self.config.session_minutes {
+                if let Some(seconds) = self.config.session_duration_in_seconds {
                     // get shortest interval to calculate number of slots required when windowing
-                    let smallest_interval_mins: i64 = plannable_spot_prices
+                    let smallest_interval_in_seconds: i64 = plannable_spot_prices
                         .iter()
-                        .map(|sp| (sp.till - sp.from).num_minutes())
+                        .map(|sp| (sp.till - sp.from).num_seconds())
                         .min()
                         .unwrap();
-                    let required_spot_prices =
-                        (mins as f64 / smallest_interval_mins as f64).ceil() as usize;
+
+                    let window_size =
+                        (seconds as f64 / smallest_interval_in_seconds as f64).ceil() as usize;
+
+                    debug!(
+                        "Windowing per {} slots for session of {}s due to smallest slot of {}s",
+                        window_size, seconds, smallest_interval_in_seconds
+                    );
 
                     let mut windows: Vec<Vec<SpotPrice>> = plannable_spot_prices
-                        .windows(required_spot_prices)
+                        .windows(window_size)
                         .map(|window| {
                             let mut spot_price_duration_selected: i64 = 0;
                             window
                                 .iter()
                                 .filter(|sp| {
                                     spot_price_duration_selected +=
-                                        (sp.till - sp.from).num_minutes();
-                                    spot_price_duration_selected <= i64::from(mins)
+                                        (sp.till - sp.from).num_seconds();
+                                    spot_price_duration_selected <= i64::from(seconds)
                                 })
                                 .cloned()
                                 .collect::<Vec<SpotPrice>>()
@@ -155,18 +163,6 @@ impl SpotPricePlanner {
             }
         }
     }
-
-    pub async fn get_spot_prices_before(
-        &self,
-        spot_prices: &[SpotPrice],
-        before: &DateTime<Utc>,
-    ) -> Result<Vec<SpotPrice>, Box<dyn Error>> {
-        Ok(spot_prices
-            .iter()
-            .filter(|&spot_price| spot_price.till <= *before)
-            .cloned()
-            .collect())
-    }
 }
 
 #[cfg(test)]
@@ -186,7 +182,7 @@ mod tests {
                     till: NaiveTime::from_hms(16, 0, 0),
                 }],
             )]),
-            session_minutes: Some(120),
+            session_duration_in_seconds: Some(7200),
             local_time_zone: "Europe/Amsterdam".to_string(),
         });
 
@@ -286,7 +282,7 @@ mod tests {
                     }],
                 ),
             ]),
-            session_minutes: Some(120),
+            session_duration_in_seconds: Some(7200),
             local_time_zone: "Europe/Amsterdam".to_string(),
         });
 
@@ -409,7 +405,7 @@ mod tests {
                     }],
                 ),
             ]),
-            session_minutes: Some(120),
+            session_duration_in_seconds: Some(7200),
             local_time_zone: "Europe/Amsterdam".to_string(),
         });
 
@@ -516,7 +512,7 @@ mod tests {
                     till: NaiveTime::from_hms(0, 0, 0),
                 }],
             )]),
-            session_minutes: Some(300),
+            session_duration_in_seconds: Some(18000),
             local_time_zone: "Europe/Amsterdam".to_string(),
         });
 
