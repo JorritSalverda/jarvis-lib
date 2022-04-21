@@ -12,7 +12,7 @@ impl SpotPricePlanner {
         Self { config }
     }
 
-    pub async fn get_plannable_spot_prices(
+    pub fn get_plannable_spot_prices(
         &self,
         spot_prices: &[SpotPrice],
         after: Option<DateTime<Utc>>,
@@ -77,15 +77,14 @@ impl SpotPricePlanner {
             .collect())
     }
 
-    pub async fn get_best_spot_prices(
+    pub fn get_best_spot_prices(
         &self,
         spot_prices: &[SpotPrice],
         after: Option<DateTime<Utc>>,
         before: Option<DateTime<Utc>>,
     ) -> Result<Vec<SpotPrice>, Box<dyn Error>> {
         let mut plannable_spot_prices: Vec<SpotPrice> = self
-            .get_plannable_spot_prices(spot_prices, after, before)
-            .await?;
+            .get_plannable_spot_prices(spot_prices, after, before)?;
 
         match self.config.planning_strategy {
             PlanningStrategy::Fragmented => {
@@ -231,8 +230,7 @@ mod tests {
 
         // act
         let plannable_spot_prices = spot_price_planner
-            .get_plannable_spot_prices(&future_spot_prices, None, None)
-            .await?;
+            .get_plannable_spot_prices(&future_spot_prices, None, None)?;
 
         assert_eq!(plannable_spot_prices.len(), 2);
         assert_eq!(
@@ -351,8 +349,7 @@ mod tests {
 
         // act
         let plannable_spot_prices = spot_price_planner
-            .get_plannable_spot_prices(&future_spot_prices, None, None)
-            .await?;
+            .get_plannable_spot_prices(&future_spot_prices, None, None)?;
 
         assert_eq!(plannable_spot_prices.len(), 3);
         assert_eq!(
@@ -473,8 +470,7 @@ mod tests {
         ];
 
         let best_spot_prices = spot_price_planner
-            .get_best_spot_prices(&future_spot_prices, None, None)
-            .await?;
+            .get_best_spot_prices(&future_spot_prices, None, None)?;
 
         assert_eq!(best_spot_prices.len(), 2);
         assert_eq!(
@@ -701,8 +697,7 @@ mod tests {
 
         // act
         let best_spot_prices = spot_price_planner
-            .get_best_spot_prices(&future_spot_prices, None, None)
-            .await?;
+            .get_best_spot_prices(&future_spot_prices, None, None)?;
 
         assert_eq!(best_spot_prices.len(), 5);
 
