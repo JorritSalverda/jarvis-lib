@@ -1,6 +1,6 @@
 use crate::model::spot_price::*;
 use chrono::{prelude::*, Duration};
-use log::debug;
+use log::{debug, info};
 use std::error::Error;
 
 pub struct SpotPricePlanner {
@@ -20,7 +20,13 @@ impl SpotPricePlanner {
     ) -> Result<Vec<SpotPrice>, Box<dyn Error>> {
         let local_time_zone = self.config.get_local_time_zone()?;
 
-        Ok(spot_prices
+        info!(
+            "Determining plannable spot prices after {:?} and before {:?}",
+            after, before
+        );
+        debug!("spot_prices:\n{:?}", spot_prices);
+
+        let plannable_spot_prices = spot_prices
             .iter()
             .filter(|&spot_price| {
                 let local_from = spot_price.from.with_timezone(&local_time_zone);
@@ -74,7 +80,11 @@ impl SpotPricePlanner {
                 false
             })
             .cloned()
-            .collect())
+            .collect();
+
+        debug!("plannable_spot_prices:\n{:?}", plannable_spot_prices);
+
+        Ok(plannable_spot_prices)
     }
 
     pub fn get_best_spot_prices(
@@ -83,8 +93,8 @@ impl SpotPricePlanner {
         after: Option<DateTime<Utc>>,
         before: Option<DateTime<Utc>>,
     ) -> Result<Vec<SpotPrice>, Box<dyn Error>> {
-        let mut plannable_spot_prices: Vec<SpotPrice> = self
-            .get_plannable_spot_prices(spot_prices, after, before)?;
+        let mut plannable_spot_prices: Vec<SpotPrice> =
+            self.get_plannable_spot_prices(spot_prices, after, before)?;
 
         match self.config.planning_strategy {
             PlanningStrategy::Fragmented => {
@@ -93,6 +103,11 @@ impl SpotPricePlanner {
                     .sort_by(|a, b| a.total_price().partial_cmp(&b.total_price()).unwrap());
 
                 if let Some(seconds) = self.config.session_duration_in_seconds {
+                    info!(
+                        "Determining best spot prices with strategy {:?} and session duration {}s",
+                        self.config.planning_strategy, seconds
+                    );
+
                     // get enough spot prices for session duration
                     let mut spot_price_duration_selected: i64 = 0;
                     let mut selected_spot_prices: Vec<SpotPrice> = vec![];
@@ -108,6 +123,8 @@ impl SpotPricePlanner {
                     // sort by time
                     selected_spot_prices.sort_by(|a, b| a.from.cmp(&b.from));
 
+                    debug!("selected_spot_prices:\n{:?}", selected_spot_prices);
+
                     Ok(selected_spot_prices)
                 } else {
                     Ok(plannable_spot_prices)
@@ -116,6 +133,11 @@ impl SpotPricePlanner {
             PlanningStrategy::Consecutive => {
                 // pick consecutive spot prices that together have lowest price
                 if let Some(seconds) = self.config.session_duration_in_seconds {
+                    info!(
+                        "Determining best spot prices with strategy {:?} and session duration {}s",
+                        self.config.planning_strategy, seconds
+                    );
+
                     // get shortest interval to calculate number of slots required when windowing
                     let smallest_interval_in_seconds: i64 = plannable_spot_prices
                         .iter()
@@ -155,7 +177,10 @@ impl SpotPricePlanner {
                         sum_a.partial_cmp(sum_b).unwrap()
                     });
 
-                    Ok(windows.first().unwrap().to_vec())
+                    let selected_spot_prices: Vec<SpotPrice> = windows.first().unwrap().to_vec();
+                    debug!("selected_spot_prices:\n{:?}", selected_spot_prices);
+
+                    Ok(selected_spot_prices)
                 } else {
                     Ok(plannable_spot_prices)
                 }
@@ -229,8 +254,8 @@ mod tests {
         ];
 
         // act
-        let plannable_spot_prices = spot_price_planner
-            .get_plannable_spot_prices(&future_spot_prices, None, None)?;
+        let plannable_spot_prices =
+            spot_price_planner.get_plannable_spot_prices(&future_spot_prices, None, None)?;
 
         assert_eq!(plannable_spot_prices.len(), 2);
         assert_eq!(
@@ -348,8 +373,8 @@ mod tests {
         ];
 
         // act
-        let plannable_spot_prices = spot_price_planner
-            .get_plannable_spot_prices(&future_spot_prices, None, None)?;
+        let plannable_spot_prices =
+            spot_price_planner.get_plannable_spot_prices(&future_spot_prices, None, None)?;
 
         assert_eq!(plannable_spot_prices.len(), 3);
         assert_eq!(
@@ -469,8 +494,8 @@ mod tests {
             },
         ];
 
-        let best_spot_prices = spot_price_planner
-            .get_best_spot_prices(&future_spot_prices, None, None)?;
+        let best_spot_prices =
+            spot_price_planner.get_best_spot_prices(&future_spot_prices, None, None)?;
 
         assert_eq!(best_spot_prices.len(), 2);
         assert_eq!(
@@ -696,8 +721,8 @@ mod tests {
         ];
 
         // act
-        let best_spot_prices = spot_price_planner
-            .get_best_spot_prices(&future_spot_prices, None, None)?;
+        let best_spot_prices =
+            spot_price_planner.get_best_spot_prices(&future_spot_prices, None, None)?;
 
         assert_eq!(best_spot_prices.len(), 5);
 
