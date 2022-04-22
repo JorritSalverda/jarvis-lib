@@ -1,9 +1,11 @@
 use crate::model::{SpotPrice, SpotPricePlanner};
+use async_trait::async_trait;
 use serde::de::DeserializeOwned;
 use std::error::Error;
 
+#[async_trait]
 pub trait PlannerClient<T: ?Sized> {
-    fn plan(
+    async fn plan(
         &self,
         config: T,
         spot_price_planner: SpotPricePlanner,

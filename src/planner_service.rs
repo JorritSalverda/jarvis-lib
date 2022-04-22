@@ -48,6 +48,7 @@ impl<T> PlannerService<T> {
             self.config
                 .planner_client
                 .plan(config, spot_price_planner, state.future_spot_prices)
+                .await
         } else {
             Err(Box::<dyn Error>::from(
                 "No spot prices state present; run jarvis-spot-price-planner first",
