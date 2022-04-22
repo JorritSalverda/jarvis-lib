@@ -96,95 +96,100 @@ impl SpotPricePlanner {
         let mut plannable_spot_prices: Vec<SpotPrice> =
             self.get_plannable_spot_prices(spot_prices, after, before)?;
 
-        match self.config.planning_strategy {
-            PlanningStrategy::Fragmented => {
-                // sort from lowest prices to highest
-                plannable_spot_prices
-                    .sort_by(|a, b| a.total_price().partial_cmp(&b.total_price()).unwrap());
-
-                if let Some(seconds) = self.config.session_duration_in_seconds {
-                    info!(
-                        "Determining best spot prices with strategy {:?} and session duration {}s",
-                        self.config.planning_strategy, seconds
-                    );
-
-                    // get enough spot prices for session duration
-                    let mut spot_price_duration_selected: i64 = 0;
-                    let mut selected_spot_prices: Vec<SpotPrice> = vec![];
-                    for spot_price in plannable_spot_prices.into_iter() {
-                        if spot_price_duration_selected < i64::from(seconds) {
-                            let spot_price_duration = spot_price.till - spot_price.from;
-
-                            spot_price_duration_selected += spot_price_duration.num_seconds();
-                            selected_spot_prices.push(spot_price);
-                        }
-                    }
-
-                    // sort by time
-                    selected_spot_prices.sort_by(|a, b| a.from.cmp(&b.from));
-
-                    debug!("selected_spot_prices:\n{:?}", selected_spot_prices);
-
-                    Ok(selected_spot_prices)
-                } else {
-                    Ok(plannable_spot_prices)
-                }
-            }
-            PlanningStrategy::Consecutive => {
-                // pick consecutive spot prices that together have lowest price
-                if let Some(seconds) = self.config.session_duration_in_seconds {
-                    info!(
-                        "Determining best spot prices with strategy {:?} and session duration {}s",
-                        self.config.planning_strategy, seconds
-                    );
-
-                    // get shortest interval to calculate number of slots required when windowing
-                    let smallest_interval_in_seconds: i64 = plannable_spot_prices
-                        .iter()
-                        .map(|sp| (sp.till - sp.from).num_seconds())
-                        .min()
-                        .unwrap();
-
-                    let window_size =
-                        (seconds as f64 / smallest_interval_in_seconds as f64).ceil() as usize;
-
-                    debug!(
-                        "Windowing per {} slots for session of {}s due to smallest slot of {}s",
-                        window_size, seconds, smallest_interval_in_seconds
-                    );
-
-                    let mut windows: Vec<Vec<SpotPrice>> = plannable_spot_prices
-                        .windows(window_size)
-                        .map(|window| {
-                            let mut spot_price_duration_selected: i64 = 0;
-                            window
-                                .iter()
-                                .filter(|sp| {
-                                    spot_price_duration_selected +=
-                                        (sp.till - sp.from).num_seconds();
-                                    spot_price_duration_selected <= i64::from(seconds)
-                                })
-                                .cloned()
-                                .collect::<Vec<SpotPrice>>()
-                        })
-                        .collect();
-
+        if !plannable_spot_prices.is_empty() {
+            match self.config.planning_strategy {
+                PlanningStrategy::Fragmented => {
                     // sort from lowest prices to highest
-                    windows.sort_by(|a, b| {
-                        let sum_a: f64 = a.iter().map(|sp| sp.total_price()).sum::<f64>();
-                        let sum_b: &f64 = &b.iter().map(|sp| sp.total_price()).sum::<f64>();
+                    plannable_spot_prices
+                        .sort_by(|a, b| a.total_price().partial_cmp(&b.total_price()).unwrap());
 
-                        sum_a.partial_cmp(sum_b).unwrap()
-                    });
+                    if let Some(seconds) = self.config.session_duration_in_seconds {
+                        info!(
+                        "Determining best spot prices with strategy {:?} and session duration {}s",
+                        self.config.planning_strategy, seconds
+                    );
 
-                    let selected_spot_prices: Vec<SpotPrice> = windows.first().unwrap().to_vec();
-                    debug!("selected_spot_prices:\n{:?}", selected_spot_prices);
+                        // get enough spot prices for session duration
+                        let mut spot_price_duration_selected: i64 = 0;
+                        let mut selected_spot_prices: Vec<SpotPrice> = vec![];
+                        for spot_price in plannable_spot_prices.into_iter() {
+                            if spot_price_duration_selected < i64::from(seconds) {
+                                let spot_price_duration = spot_price.till - spot_price.from;
 
-                    Ok(selected_spot_prices)
-                } else {
-                    Ok(plannable_spot_prices)
+                                spot_price_duration_selected += spot_price_duration.num_seconds();
+                                selected_spot_prices.push(spot_price);
+                            }
+                        }
+
+                        // sort by time
+                        selected_spot_prices.sort_by(|a, b| a.from.cmp(&b.from));
+
+                        debug!("selected_spot_prices:\n{:?}", selected_spot_prices);
+
+                        Ok(selected_spot_prices)
+                    } else {
+                        Ok(plannable_spot_prices)
+                    }
+                }
+                PlanningStrategy::Consecutive => {
+                    // pick consecutive spot prices that together have lowest price
+                    if let Some(seconds) = self.config.session_duration_in_seconds {
+                        info!(
+                        "Determining best spot prices with strategy {:?} and session duration {}s",
+                        self.config.planning_strategy, seconds
+                    );
+
+                        // get shortest interval to calculate number of slots required when windowing
+                        let smallest_interval_in_seconds: i64 = plannable_spot_prices
+                            .iter()
+                            .map(|sp| (sp.till - sp.from).num_seconds())
+                            .min()
+                            .unwrap();
+
+                        let window_size =
+                            (seconds as f64 / smallest_interval_in_seconds as f64).ceil() as usize;
+
+                        debug!(
+                            "Windowing per {} slots for session of {}s due to smallest slot of {}s",
+                            window_size, seconds, smallest_interval_in_seconds
+                        );
+
+                        let mut windows: Vec<Vec<SpotPrice>> = plannable_spot_prices
+                            .windows(window_size)
+                            .map(|window| {
+                                let mut spot_price_duration_selected: i64 = 0;
+                                window
+                                    .iter()
+                                    .filter(|sp| {
+                                        spot_price_duration_selected +=
+                                            (sp.till - sp.from).num_seconds();
+                                        spot_price_duration_selected <= i64::from(seconds)
+                                    })
+                                    .cloned()
+                                    .collect::<Vec<SpotPrice>>()
+                            })
+                            .collect();
+
+                        // sort from lowest prices to highest
+                        windows.sort_by(|a, b| {
+                            let sum_a: f64 = a.iter().map(|sp| sp.total_price()).sum::<f64>();
+                            let sum_b: &f64 = &b.iter().map(|sp| sp.total_price()).sum::<f64>();
+
+                            sum_a.partial_cmp(sum_b).unwrap()
+                        });
+
+                        let selected_spot_prices: Vec<SpotPrice> =
+                            windows.first().unwrap().to_vec();
+                        debug!("selected_spot_prices:\n{:?}", selected_spot_prices);
+
+                        Ok(selected_spot_prices)
+                    } else {
+                        Ok(plannable_spot_prices)
+                    }
                 }
             }
+        } else {
+          Ok(plannable_spot_prices)
         }
     }
 }
