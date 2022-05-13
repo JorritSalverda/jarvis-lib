@@ -189,7 +189,7 @@ impl SpotPricePlanner {
                 }
             }
         } else {
-          Ok(plannable_spot_prices)
+            Ok(plannable_spot_prices)
         }
     }
 }

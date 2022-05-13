@@ -1,4 +1,5 @@
 use crate::model::Measurement;
+use log::{debug, info};
 use std::env;
 use std::error::Error;
 
@@ -10,7 +11,7 @@ pub struct NatsClientConfig {
 
 impl NatsClientConfig {
     pub async fn new(host: String, subject: String, queue: String) -> Result<Self, Box<dyn Error>> {
-        println!(
+        debug!(
             "NatsClientConfig::new(host: {}, subject: {}, queue: {})",
             host, subject, queue
         );
@@ -56,7 +57,7 @@ impl NatsClient {
     }
 
     pub fn queue_subscribe(&mut self) -> Result<nats::Subscription, Box<dyn Error>> {
-        println!(
+        info!(
             "Subscribing to nats subject {} for queue {}",
             &self.config.subject, &self.config.queue
         );
@@ -77,7 +78,7 @@ impl NatsClient {
     }
 
     pub fn publish(&mut self, measurement: &Measurement) -> Result<(), Box<dyn Error>> {
-        println!(
+        info!(
             "Publishing measurement to nats subject {}",
             &self.config.subject
         );

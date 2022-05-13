@@ -5,6 +5,7 @@ use kube::{
     api::{Api, PostParams},
     Client,
 };
+use log::{debug, info};
 use std::collections::BTreeMap;
 use std::env;
 use std::error::Error;
@@ -25,7 +26,7 @@ impl StateClientConfig {
         measurement_file_configmap_name: String,
         current_namespace: String,
     ) -> Result<Self, Box<dyn Error>> {
-        println!(
+        debug!(
             "StateClientConfig::new(measurement_file_path: {}, measurement_file_configmap_name: {}, current_namespace: {})",
             measurement_file_path, measurement_file_configmap_name, current_namespace
         );
@@ -83,7 +84,7 @@ impl StateClient {
             Err(_) => return Ok(Option::None),
         };
 
-        println!(
+        info!(
             "Read previous measurement from state file at {}",
             &self.config.measurement_file_path
         );
@@ -158,7 +159,7 @@ impl StateClient {
         // update configmap to have measurement available when the application runs the next time and for other applications
         self.update_state_configmap(&config_map).await?;
 
-        println!(
+        info!(
             "Stored last measurement in configmap {}",
             &self.config.measurement_file_configmap_name
         );

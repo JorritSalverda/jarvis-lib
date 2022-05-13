@@ -1,4 +1,5 @@
 use crate::model::*;
+use log::info;
 use std::env;
 use std::error::Error;
 use std::fs;
@@ -46,7 +47,7 @@ impl SpotPricesStateClient {
             Err(_) => return Ok(Option::None),
         };
 
-        println!("Read state file at {}", &self.config.state_file_path);
+        info!("Read state file at {}", &self.config.state_file_path);
 
         Ok(last_state)
     }

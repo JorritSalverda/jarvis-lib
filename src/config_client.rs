@@ -1,4 +1,5 @@
 use crate::model::*;
+use log::{debug, info};
 use serde::de::DeserializeOwned;
 use serde_yaml;
 use std::env;
@@ -15,7 +16,7 @@ pub struct ConfigClientConfig {
 
 impl ConfigClientConfig {
     pub fn new(config_path: String) -> Result<Self, Box<dyn Error>> {
-        println!("ConfigClientConfig::new(config_path: {})", config_path);
+        debug!("ConfigClientConfig::new(config_path: {})", config_path);
         Ok(Self { config_path })
     }
 
@@ -45,7 +46,7 @@ impl ConfigClient {
 
         config.set_defaults();
 
-        println!("Loaded config from {}", &self.config.config_path);
+        info!("Loaded config from {}", &self.config.config_path);
 
         Ok(config)
     }
@@ -54,7 +55,7 @@ impl ConfigClient {
         let config_file_contents = fs::read_to_string(&self.config.config_path)?;
         let config: SpotPricePlannerConfig = serde_yaml::from_str(&config_file_contents)?;
 
-        println!("Loaded planner config from {}", &self.config.config_path);
+        info!("Loaded planner config from {}", &self.config.config_path);
 
         Ok(config)
     }
