@@ -1,7 +1,10 @@
 use crate::model::spot_price::*;
 use chrono::prelude::*;
+use chrono::{naive::NaiveTime, DateTime, Duration, Utc, Weekday};
+use chrono_tz::Tz;
 use log::{debug, info};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::error::Error;
 
 #[derive(Copy, Clone, PartialEq, Serialize, Deserialize, Debug)]
@@ -94,8 +97,23 @@ fn total_price_for_load(spot_prices: &[SpotPrice], load_profile: &LoadProfile) -
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct TimeSlot {
+    pub from: NaiveTime,
+    pub till: NaiveTime,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct SpotPricePlannerConfig {
+    pub plannable_local_time_slots: HashMap<Weekday, Vec<TimeSlot>>,
+    pub local_time_zone: String,
     pub load_profile: LoadProfile,
+}
+
+impl SpotPricePlannerConfig {
+    pub fn get_local_time_zone(&self) -> Result<Tz, Box<dyn Error>> {
+        Ok(self.local_time_zone.parse::<Tz>()?)
+    }
 }
 
 pub struct SpotPricePlanner {
@@ -113,6 +131,8 @@ impl SpotPricePlanner {
         after: &Option<DateTime<Utc>>,
         before: &Option<DateTime<Utc>>,
     ) -> Result<Vec<SpotPrice>, Box<dyn Error>> {
+        let local_time_zone = self.config.get_local_time_zone()?;
+
         info!(
             "Determining plannable spot prices after {:?} and before {:?}",
             after, before
@@ -122,6 +142,9 @@ impl SpotPricePlanner {
         let plannable_spot_prices = spot_prices
             .iter()
             .filter(|&spot_price| {
+                let local_from = spot_price.from.with_timezone(&local_time_zone);
+                let local_till = spot_price.till.with_timezone(&local_time_zone);
+
                 if let Some(a) = after {
                     if spot_price.from < *a {
                         return false;
@@ -134,7 +157,40 @@ impl SpotPricePlanner {
                     }
                 }
 
-                true
+                if let Some(plannable_local_time_slots) = self
+                    .config
+                    .plannable_local_time_slots
+                    .get(&local_from.weekday())
+                {
+                    plannable_local_time_slots.iter().any(|time_slot| {
+                        let time_slot_from = local_from.date().and_hms(
+                            time_slot.from.hour(),
+                            time_slot.from.minute(),
+                            time_slot.from.second(),
+                        );
+
+                        let time_slot_till = if time_slot.till.hour() > 0 {
+                            local_from.date().and_hms(
+                                time_slot.till.hour(),
+                                time_slot.till.minute(),
+                                time_slot.till.second(),
+                            )
+                        } else {
+                            local_from.date().and_hms(
+                                time_slot.till.hour(),
+                                time_slot.till.minute(),
+                                time_slot.till.second(),
+                            ) + Duration::days(1)
+                        };
+
+                        local_from >= time_slot_from
+                            && local_from < time_slot_till
+                            && local_till > time_slot_from
+                            && local_till <= time_slot_till
+                    })
+                } else {
+                    false
+                }
             })
             .cloned()
             .collect();
@@ -327,6 +383,575 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn get_plannable_spot_prices_returns_only_spot_prices_fitting_in_plannable_time_slots(
+    ) -> Result<(), Box<dyn Error>> {
+        let load_profile = LoadProfile {
+            sections: vec![LoadProfileSection {
+                duration_seconds: 7200,
+                power_draw_watt: 2000.0,
+            }],
+        };
+
+        let spot_price_planner = SpotPricePlanner::new(SpotPricePlannerConfig {
+            load_profile: load_profile.clone(),
+            plannable_local_time_slots: HashMap::from([(
+                Weekday::Thu,
+                vec![TimeSlot {
+                    from: NaiveTime::from_hms(14, 0, 0),
+                    till: NaiveTime::from_hms(16, 0, 0),
+                }],
+            )]),
+            local_time_zone: "Europe/Amsterdam".to_string(),
+        });
+
+        let future_spot_prices: Vec<SpotPrice> = vec![
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 14).and_hms(11, 0, 0),
+                till: Utc.ymd(2022, 4, 14).and_hms(12, 0, 0),
+                market_price: 0.202,
+                market_price_tax: 0.0424053,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 14).and_hms(12, 0, 0),
+                till: Utc.ymd(2022, 4, 14).and_hms(13, 0, 0),
+                market_price: 0.195,
+                market_price_tax: 0.0409899,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 14).and_hms(13, 0, 0),
+                till: Utc.ymd(2022, 4, 14).and_hms(14, 0, 0),
+                market_price: 0.194,
+                market_price_tax: 0.0406644,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 14).and_hms(14, 0, 0),
+                till: Utc.ymd(2022, 4, 14).and_hms(15, 0, 0),
+                market_price: 0.192,
+                market_price_tax: 0.0403179,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+        ];
+
+        // act
+        let plannable_spot_prices =
+            spot_price_planner.get_plannable_spot_prices(&future_spot_prices, &None, &None)?;
+
+        assert_eq!(plannable_spot_prices.len(), 2);
+        assert_eq!(
+            plannable_spot_prices[0].from,
+            Utc.ymd(2022, 4, 14).and_hms(12, 0, 0)
+        );
+        assert_eq!(
+            plannable_spot_prices[0].till,
+            Utc.ymd(2022, 4, 14).and_hms(13, 0, 0)
+        );
+        assert_eq!(
+            plannable_spot_prices[1].from,
+            Utc.ymd(2022, 4, 14).and_hms(13, 0, 0)
+        );
+        assert_eq!(
+            plannable_spot_prices[1].till,
+            Utc.ymd(2022, 4, 14).and_hms(14, 0, 0)
+        );
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn get_plannable_spot_prices_returns_only_spot_prices_fitting_in_plannable_time_slots_when_includes_next_day(
+    ) -> Result<(), Box<dyn Error>> {
+        let load_profile = LoadProfile {
+            sections: vec![LoadProfileSection {
+                duration_seconds: 18000,
+                power_draw_watt: 2000.0,
+            }],
+        };
+
+        let spot_price_planner = SpotPricePlanner::new(SpotPricePlannerConfig {
+            load_profile: load_profile.clone(),
+            plannable_local_time_slots: HashMap::from([
+                (
+                    Weekday::Thu,
+                    vec![
+                        TimeSlot {
+                            from: NaiveTime::from_hms(14, 0, 0),
+                            till: NaiveTime::from_hms(16, 0, 0),
+                        },
+                        TimeSlot {
+                            from: NaiveTime::from_hms(23, 0, 0),
+                            till: NaiveTime::from_hms(0, 0, 0),
+                        },
+                    ],
+                ),
+                (
+                    Weekday::Fri,
+                    vec![TimeSlot {
+                        from: NaiveTime::from_hms(0, 0, 0),
+                        till: NaiveTime::from_hms(2, 0, 0),
+                    }],
+                ),
+            ]),
+            local_time_zone: "Europe/Amsterdam".to_string(),
+        });
+
+        let future_spot_prices: Vec<SpotPrice> = vec![
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 14).and_hms(20, 0, 0),
+                till: Utc.ymd(2022, 4, 14).and_hms(21, 0, 0),
+                market_price: 0.265,
+                market_price_tax: 0.0557466,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 14).and_hms(21, 0, 0),
+                till: Utc.ymd(2022, 4, 14).and_hms(22, 0, 0),
+                market_price: 0.254,
+                market_price_tax: 0.0532728,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 14).and_hms(22, 0, 0),
+                till: Utc.ymd(2022, 4, 14).and_hms(23, 0, 0),
+                market_price: 0.231,
+                market_price_tax: 0.0484281,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 14).and_hms(23, 0, 0),
+                till: Utc.ymd(2022, 4, 15).and_hms(0, 0, 0),
+                market_price: 0.215,
+                market_price_tax: 0.045129,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 15).and_hms(0, 0, 0),
+                till: Utc.ymd(2022, 4, 15).and_hms(1, 0, 0),
+                market_price: 0.217,
+                market_price_tax: 0.04557,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 15).and_hms(1, 0, 0),
+                till: Utc.ymd(2022, 4, 15).and_hms(2, 0, 0),
+                market_price: 0.208,
+                market_price_tax: 0.0437535,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+        ];
+
+        // act
+        let plannable_spot_prices =
+            spot_price_planner.get_plannable_spot_prices(&future_spot_prices, &None, &None)?;
+
+        assert_eq!(plannable_spot_prices.len(), 3);
+        assert_eq!(
+            plannable_spot_prices[0].from,
+            Utc.ymd(2022, 4, 14).and_hms(21, 0, 0)
+        );
+        assert_eq!(
+            plannable_spot_prices[0].till,
+            Utc.ymd(2022, 4, 14).and_hms(22, 0, 0)
+        );
+        assert_eq!(
+            plannable_spot_prices[1].from,
+            Utc.ymd(2022, 4, 14).and_hms(22, 0, 0)
+        );
+        assert_eq!(
+            plannable_spot_prices[1].till,
+            Utc.ymd(2022, 4, 14).and_hms(23, 0, 0)
+        );
+
+        assert_eq!(
+            plannable_spot_prices[2].from,
+            Utc.ymd(2022, 4, 14).and_hms(23, 0, 0)
+        );
+        assert_eq!(
+            plannable_spot_prices[2].till,
+            Utc.ymd(2022, 4, 15).and_hms(0, 0, 0)
+        );
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn get_plannable_spot_prices_with_before() -> Result<(), Box<dyn Error>> {
+        let load_profile = LoadProfile {
+            sections: vec![LoadProfileSection {
+                duration_seconds: 18000,
+                power_draw_watt: 2000.0,
+            }],
+        };
+
+        let spot_price_planner = SpotPricePlanner::new(SpotPricePlannerConfig {
+            load_profile: load_profile.clone(),
+            plannable_local_time_slots: HashMap::from([
+                (
+                    Weekday::Thu,
+                    vec![
+                        TimeSlot {
+                            from: NaiveTime::from_hms(0, 0, 0),
+                            till: NaiveTime::from_hms(7, 0, 0),
+                        },
+                        TimeSlot {
+                            from: NaiveTime::from_hms(23, 0, 0),
+                            till: NaiveTime::from_hms(0, 0, 0),
+                        },
+                    ],
+                ),
+                (
+                    Weekday::Fri,
+                    vec![
+                        TimeSlot {
+                            from: NaiveTime::from_hms(0, 0, 0),
+                            till: NaiveTime::from_hms(7, 0, 0),
+                        },
+                        TimeSlot {
+                            from: NaiveTime::from_hms(23, 0, 0),
+                            till: NaiveTime::from_hms(0, 0, 0),
+                        },
+                    ],
+                ),
+            ]),
+            local_time_zone: "Europe/Amsterdam".to_string(),
+        });
+
+        let future_spot_prices: Vec<SpotPrice> = vec![
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 21).and_hms(19, 0, 0),
+                till: Utc.ymd(2022, 4, 21).and_hms(20, 0, 0),
+                market_price: 0.224,
+                market_price_tax: 0.0469581,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 21).and_hms(20, 0, 0),
+                till: Utc.ymd(2022, 4, 21).and_hms(21, 0, 0),
+                market_price: 0.22,
+                market_price_tax: 0.0462924,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 21).and_hms(21, 0, 0),
+                till: Utc.ymd(2022, 4, 21).and_hms(22, 0, 0),
+                market_price: 0.2,
+                market_price_tax: 0.0419391,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 21).and_hms(22, 0, 0),
+                till: Utc.ymd(2022, 4, 21).and_hms(23, 0, 0),
+                market_price: 0.193,
+                market_price_tax: 0.040614,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 21).and_hms(23, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(0, 0, 0),
+                market_price: 0.206,
+                market_price_tax: 0.04326,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(0, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(1, 0, 0),
+                market_price: 0.187,
+                market_price_tax: 0.0393078,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(1, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(2, 0, 0),
+                market_price: 0.187,
+                market_price_tax: 0.0392721,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(2, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(3, 0, 0),
+                market_price: 0.179,
+                market_price_tax: 0.0376761,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(3, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(4, 0, 0),
+                market_price: 0.176,
+                market_price_tax: 0.0369789,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(4, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(5, 0, 0),
+                market_price: 0.19,
+                market_price_tax: 0.03981180000000001,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(5, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(6, 0, 0),
+                market_price: 0.218,
+                market_price_tax: 0.0457947,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(6, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(7, 0, 0),
+                market_price: 0.24,
+                market_price_tax: 0.0503895,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(7, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(8, 0, 0),
+                market_price: 0.244,
+                market_price_tax: 0.051260999999999994,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(8, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(9, 0, 0),
+                market_price: 0.221,
+                market_price_tax: 0.0464205,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(9, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(10, 0, 0),
+                market_price: 0.197,
+                market_price_tax: 0.0412776,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(10, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(11, 0, 0),
+                market_price: 0.157,
+                market_price_tax: 0.0330561,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(11, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(12, 0, 0),
+                market_price: 0.15,
+                market_price_tax: 0.03141599999999999,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(12, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(13, 0, 0),
+                market_price: 0.102,
+                market_price_tax: 0.02142,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(13, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(14, 0, 0),
+                market_price: 0.1,
+                market_price_tax: 0.021,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(14, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(15, 0, 0),
+                market_price: 0.087,
+                market_price_tax: 0.0182217,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(15, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(16, 0, 0),
+                market_price: 0.119,
+                market_price_tax: 0.0249837,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(16, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(17, 0, 0),
+                market_price: 0.167,
+                market_price_tax: 0.03507,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(17, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(18, 0, 0),
+                market_price: 0.185,
+                market_price_tax: 0.038829,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(18, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(19, 0, 0),
+                market_price: 0.21,
+                market_price_tax: 0.0440181,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(19, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(20, 0, 0),
+                market_price: 0.21,
+                market_price_tax: 0.0440937,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(20, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(21, 0, 0),
+                market_price: 0.21,
+                market_price_tax: 0.0440286,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(21, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(22, 0, 0),
+                market_price: 0.192,
+                market_price_tax: 0.04032,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+            SpotPrice {
+                id: None,
+                source: None,
+                from: Utc.ymd(2022, 4, 22).and_hms(22, 0, 0),
+                till: Utc.ymd(2022, 4, 22).and_hms(23, 0, 0),
+                market_price: 0.178,
+                market_price_tax: 0.0372855,
+                sourcing_markup_price: 0.017,
+                energy_tax_price: 0.081,
+            },
+        ];
+
+        // act
+        let plannable_spot_prices = spot_price_planner.get_plannable_spot_prices(
+            &future_spot_prices,
+            &Some(Utc.ymd(2022, 4, 21).and_hms(21, 32, 28)),
+            &Some(Utc.ymd(2022, 4, 22).and_hms(7, 32, 28)),
+        )?;
+
+        assert_eq!(plannable_spot_prices.len(), 7);
+        assert_eq!(
+            plannable_spot_prices[0].from,
+            Utc.ymd(2022, 4, 21).and_hms(22, 0, 0)
+        );
+        assert_eq!(
+            plannable_spot_prices[6].till,
+            Utc.ymd(2022, 4, 22).and_hms(5, 0, 0)
+        );
+
+        Ok(())
+    }
+
+    #[tokio::test]
     async fn get_best_spot_prices_returns_cheapest_combined_block_spot_of_prices_amounting_to_enough_duration_ordered_by_time_for_lowest_price_strategy(
     ) -> Result<(), Box<dyn Error>> {
         let load_profile = LoadProfile {
@@ -338,6 +963,14 @@ mod tests {
 
         let spot_price_planner = SpotPricePlanner::new(SpotPricePlannerConfig {
             load_profile: load_profile.clone(),
+            plannable_local_time_slots: HashMap::from([(
+                Weekday::Sat,
+                vec![TimeSlot {
+                    from: NaiveTime::from_hms(0, 0, 0),
+                    till: NaiveTime::from_hms(0, 0, 0),
+                }],
+            )]),
+            local_time_zone: "Europe/Amsterdam".to_string(),
         });
 
         let request = PlanningRequest {
@@ -586,6 +1219,14 @@ mod tests {
 
         let spot_price_planner = SpotPricePlanner::new(SpotPricePlannerConfig {
             load_profile: load_profile.clone(),
+            plannable_local_time_slots: HashMap::from([(
+                Weekday::Sat,
+                vec![TimeSlot {
+                    from: NaiveTime::from_hms(0, 0, 0),
+                    till: NaiveTime::from_hms(0, 0, 0),
+                }],
+            )]),
+            local_time_zone: "Europe/Amsterdam".to_string(),
         });
 
         let request = PlanningRequest {
@@ -803,7 +1444,4 @@ mod tests {
 
         Ok(())
     }
-
-    // 2*0.171 + 2*0.195 + 4*0.206 = 1.556
-    // 2*0.195 + 2*0.206 + 4*0.194 = 1,578
 }

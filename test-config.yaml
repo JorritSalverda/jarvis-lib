@@ -4,6 +4,16 @@ entityType: ENTITY_TYPE_DEVICE
 entityName: TP-Link HS110
 
 # planner config
+plannableLocalTimeSlots:
+  Thu:
+    - from: 0:00:00
+      till: 7:00:00
+    - from: 23:00:00
+      till: 0:00:00
+  Sat:
+    - from: 0:00:00
+      till: 0:00:00
+localTimeZone: Europe/Amsterdam 
 loadProfile:
   sections:
     - durationSeconds: 7200
