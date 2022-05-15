@@ -13,8 +13,7 @@ pub use crate::model::metric_type::MetricType;
 pub use crate::model::sample::Sample;
 pub use crate::model::sample_type::SampleType;
 pub use crate::model::spot_price::*;
-pub use crate::model::spot_price_planner::SpotPricePlanner;
-pub use crate::model::spot_price_planner::SpotPricePlannerConfig;
+pub use crate::model::spot_price_planner::*;
 pub use crate::model::spot_prices_state::*;
 
 #[cfg(test)]
