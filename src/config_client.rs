@@ -65,8 +65,6 @@ impl ConfigClient {
 mod tests {
     use super::*;
     use crate::model::EntityType;
-    use chrono::naive::NaiveTime;
-    use chrono::Weekday;
     use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Debug)]
@@ -100,74 +98,10 @@ mod tests {
 
         let config: SpotPricePlannerConfig = config_client.read_planner_config_from_file().unwrap();
 
-        assert_eq!(config.planning_strategy, PlanningStrategy::Fragmented);
-
-        assert_eq!(config.plannable_local_time_slots.len(), 2);
-        assert_eq!(config.session_duration_in_seconds.unwrap(), 4500);
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Thu)
-                .unwrap()
-                .len(),
-            2
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Thu)
-                .unwrap()[0]
-                .from,
-            NaiveTime::from_hms(0, 0, 0)
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Thu)
-                .unwrap()[0]
-                .till,
-            NaiveTime::from_hms(7, 0, 0)
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Thu)
-                .unwrap()[1]
-                .from,
-            NaiveTime::from_hms(23, 0, 0)
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Thu)
-                .unwrap()[1]
-                .till,
-            NaiveTime::from_hms(0, 0, 0)
-        );
-
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Sat)
-                .unwrap()
-                .len(),
-            1
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Sat)
-                .unwrap()[0]
-                .from,
-            NaiveTime::from_hms(0, 0, 0)
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Sat)
-                .unwrap()[0]
-                .till,
-            NaiveTime::from_hms(0, 0, 0)
-        );
+        assert_eq!(config.load_profile.sections.len(), 2);
+        assert_eq!(config.load_profile.sections[0].duration_seconds, 7200);
+        assert_eq!(config.load_profile.sections[0].power_draw_watt, 2000.0);
+        assert_eq!(config.load_profile.sections[1].duration_seconds, 1800);
+        assert_eq!(config.load_profile.sections[1].power_draw_watt, 8000.0);
     }
 }

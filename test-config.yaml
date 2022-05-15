@@ -4,15 +4,9 @@ entityType: ENTITY_TYPE_DEVICE
 entityName: TP-Link HS110
 
 # planner config
-planningStrategy: Fragmented
-plannableLocalTimeSlots:
-  Thu:
-    - from: 0:00:00
-      till: 7:00:00
-    - from: 23:00:00
-      till: 0:00:00
-  Sat:
-    - from: 0:00:00
-      till: 0:00:00
-sessionDurationInSeconds: 4500
-localTimeZone: Europe/Amsterdam
+loadProfile:
+  sections:
+    - durationSeconds: 7200
+      powerDrawWatt: 2000
+    - durationSeconds: 1800
+      powerDrawWatt: 8000
