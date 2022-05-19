@@ -212,7 +212,7 @@ impl SpotPricePlanner {
             let mut best_spot_prices: Vec<SpotPrice> = vec![];
 
             // loop spot prices
-            let mut spot_prices_iter = request.spot_prices.iter();
+            let mut spot_prices_iter = plannable_spot_prices.iter();
             while let Some(spot_price) = spot_prices_iter.next() {
                 let mut selected_spot_prices: Vec<SpotPrice> = vec![spot_price.clone()];
                 let mut selected_seconds = spot_price.duration_seconds();
