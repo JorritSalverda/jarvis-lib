@@ -54,18 +54,18 @@ pub struct PlanningResponse {
 }
 
 impl PlanningResponse {
-    pub fn total_price(&self) -> f64 {
-        total_price_for_load(&self.spot_prices, &self.load_profile)
+    pub fn total_price(&self, get_price_fn: Option<fn(&SpotPrice) -> f64>) -> f64 {
+        total_price_for_load(&self.spot_prices, &self.load_profile, get_price_fn)
     }
 }
 
-fn total_price_for_load(spot_prices: &[SpotPrice], load_profile: &LoadProfile) -> f64 {
+fn total_price_for_load(spot_prices: &[SpotPrice], load_profile: &LoadProfile, get_price_fn: Option<fn(&SpotPrice) -> f64>) -> f64 {
     if !spot_prices.is_empty() && !load_profile.sections.is_empty() {
         let total_required_seconds = load_profile.total_duration_seconds() as usize;
 
         let mut spot_price_per_second: Vec<f64> = vec![];
         for spot_price in spot_prices {
-            let price_per_second = spot_price.total_price() / (3600_f64 * 1000_f64);
+            let price_per_second = get_price_fn.unwrap_or(|sp| sp.total_price())(spot_price) / (3600_f64 * 1000_f64);
 
             let seconds_still_needed = std::cmp::min(
                 spot_price.duration_seconds() as usize,
@@ -240,9 +240,9 @@ impl SpotPricePlanner {
                 } else {
                     // compare to previous best/worst
                     let total_price_previous =
-                        total_price_for_load(&best_spot_prices, &request.load_profile);
+                        total_price_for_load(&best_spot_prices, &request.load_profile, None);
                     let total_price_current =
-                        total_price_for_load(&selected_spot_prices, &request.load_profile);
+                        total_price_for_load(&selected_spot_prices, &request.load_profile, None);
 
                     match request.planning_strategy {
                         PlanningStrategy::LowestPrice => {
@@ -287,6 +287,7 @@ mod tests {
                     power_draw_watt: 2000.0,
                 }],
             },
+            None,
         );
 
         assert_eq!(total_price, 0.0);
@@ -307,6 +308,7 @@ mod tests {
                 energy_tax_price: 0.081,
             }],
             &LoadProfile { sections: vec![] },
+            None,
         );
 
         assert_eq!(total_price, 0.0);
@@ -333,6 +335,7 @@ mod tests {
                     power_draw_watt: 2000.0,
                 }],
             },
+            None,
         );
 
         assert_eq!(total_price, 0.6848106000000072); // round error, should be 0.6848106
@@ -377,6 +380,7 @@ mod tests {
                     },
                 ],
             },
+            None,
         );
 
         assert_eq!(total_price, 2.0207701999998684); // round error, should be 2.0207702
@@ -1165,7 +1169,7 @@ mod tests {
         // act
         let response = spot_price_planner.get_best_spot_prices(&request)?;
 
-        assert_eq!(response.total_price(), 1.5294701999999742);
+        assert_eq!(response.total_price(None), 1.5294701999999742);
 
         assert_eq!(response.spot_prices.len(), 5);
         assert_eq!(
@@ -1421,7 +1425,7 @@ mod tests {
         // act
         let response = spot_price_planner.get_best_spot_prices(&request)?;
 
-        assert_eq!(response.total_price(), 2.693728600000162);
+        assert_eq!(response.total_price(None), 2.693728600000162);
 
         assert_eq!(response.spot_prices.len(), 3);
         assert_eq!(
