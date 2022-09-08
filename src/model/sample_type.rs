@@ -26,4 +26,8 @@ pub enum SampleType {
     TemperatureSetpoint,
     #[serde(rename = "SAMPLE_TYPE_TIME")]
     Time,
+    #[serde(rename = "SAMPLE_TYPE_ELECTRICITY_VOLTAGE")]
+    ElectricityVoltage,
+    #[serde(rename = "SAMPLE_TYPE_ELECTRICITY_CURRENT")]
+    ElectricityCurrent,
 }

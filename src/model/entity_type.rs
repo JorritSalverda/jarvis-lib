@@ -11,4 +11,6 @@ pub enum EntityType {
     Zone,
     #[serde(rename = "ENTITY_TYPE_DEVICE")]
     Device,
+    #[serde(rename = "ENTITY_TYPE_PHASE")]
+    Phase,
 }
