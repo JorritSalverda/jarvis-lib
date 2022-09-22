@@ -30,4 +30,6 @@ pub enum SampleType {
     ElectricityVoltage,
     #[serde(rename = "SAMPLE_TYPE_ELECTRICITY_CURRENT")]
     ElectricityCurrent,
+    #[serde(rename = "SAMPLE_TYPE_WATER_CONSUMPTION")]
+    WaterConsumption,
 }
