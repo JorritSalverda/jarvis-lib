@@ -51,9 +51,10 @@ impl<T> ExporterService<T> {
             .measurement_client
             .get_measurement(config, last_measurement)?;
 
-        self.config.nats_client.publish(&measurement)?;
-
-        self.config.state_client.store_state(&measurement).await?;
+        if let Some(measurement) = measurement {
+            self.config.nats_client.publish(&measurement)?;
+            self.config.state_client.store_state(&measurement).await?;
+        }
 
         Ok(())
     }

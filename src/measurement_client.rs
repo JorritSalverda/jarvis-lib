@@ -7,7 +7,7 @@ pub trait MeasurementClient<T: ?Sized> {
         &self,
         config: T,
         last_measurement: Option<Measurement>,
-    ) -> Result<Measurement, Box<dyn Error>>
+    ) -> Result<Option<Measurement>, Box<dyn Error>>
     where
         T: DeserializeOwned;
 }
