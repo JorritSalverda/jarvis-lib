@@ -34,4 +34,6 @@ pub enum SampleType {
     WaterConsumption,
     #[serde(rename = "SAMPLE_TYPE_DISTANCE_TRAVELED")]
     DistanceTraveled,
+    #[serde(rename = "SAMPLE_TYPE_AVAILABILITY")]
+    Availability,
 }
