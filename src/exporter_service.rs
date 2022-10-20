@@ -46,14 +46,17 @@ impl<T> ExporterService<T> {
 
         let last_measurement = self.config.state_client.read_state()?;
 
-        let measurement = self
+        let measurements = self
             .config
             .measurement_client
-            .get_measurement(config, last_measurement)?;
+            .get_measurements(config, last_measurement)?;
 
-        if let Some(measurement) = measurement {
-            self.config.nats_client.publish(&measurement)?;
-            self.config.state_client.store_state(&measurement).await?;
+        for measurement in &measurements {
+            self.config.nats_client.publish(measurement)?;
+        }
+
+        if !measurements.is_empty() {
+            self.config.state_client.store_state(&measurements).await?;
         }
 
         Ok(())

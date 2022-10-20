@@ -3,11 +3,11 @@ use serde::de::DeserializeOwned;
 use std::error::Error;
 
 pub trait MeasurementClient<T: ?Sized> {
-    fn get_measurement(
+    fn get_measurements(
         &self,
         config: T,
-        last_measurement: Option<Measurement>,
-    ) -> Result<Option<Measurement>, Box<dyn Error>>
+        last_measurements: Option<Vec<Measurement>>,
+    ) -> Result<Vec<Measurement>, Box<dyn Error>>
     where
         T: DeserializeOwned;
 }

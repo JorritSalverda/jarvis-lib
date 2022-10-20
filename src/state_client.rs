@@ -72,24 +72,24 @@ impl StateClient {
         Ok(Self::new(StateClientConfig::from_env().await?))
     }
 
-    pub fn read_state(&self) -> Result<Option<Measurement>, Box<dyn std::error::Error>> {
+    pub fn read_state(&self) -> Result<Option<Vec<Measurement>>, Box<dyn std::error::Error>> {
         let state_file_contents = match fs::read_to_string(&self.config.measurement_file_path) {
             Ok(c) => c,
             Err(_) => return Ok(Option::None),
         };
 
-        let last_measurement: Option<Measurement> = match serde_yaml::from_str(&state_file_contents)
-        {
-            Ok(lm) => Some(lm),
-            Err(_) => return Ok(Option::None),
-        };
+        let last_measurements: Option<Vec<Measurement>> =
+            match serde_yaml::from_str(&state_file_contents) {
+                Ok(lm) => Some(lm),
+                Err(_) => return Ok(Option::None),
+            };
 
         info!(
-            "Read previous measurement from state file at {}",
+            "Read previous measurements from state file at {}",
             &self.config.measurement_file_path
         );
 
-        Ok(last_measurement)
+        Ok(last_measurements)
     }
 
     async fn get_state_configmap(&self) -> Result<ConfigMap, Box<dyn std::error::Error>> {
@@ -127,13 +127,13 @@ impl StateClient {
 
     pub async fn store_state(
         &self,
-        measurement: &Measurement,
+        measurements: &[Measurement],
     ) -> Result<(), Box<dyn std::error::Error>> {
         // retrieve configmap
         let mut config_map = self.get_state_configmap().await?;
 
         // marshal state to yaml
-        let yaml_data = match serde_yaml::to_string(measurement) {
+        let yaml_data = match serde_yaml::to_string(measurements) {
             Ok(yd) => yd,
             Err(e) => return Err(Box::new(e)),
         };
@@ -160,7 +160,7 @@ impl StateClient {
         self.update_state_configmap(&config_map).await?;
 
         info!(
-            "Stored last measurement in configmap {}",
+            "Stored last measurements in configmap {}",
             &self.config.measurement_file_configmap_name
         );
 
@@ -199,18 +199,24 @@ mod tests {
         let last_measurement = state_client.read_state().unwrap();
         match last_measurement {
             Some(lm) => {
-                assert_eq!(lm.id, "cc6e17bb-fd60-4dde-acc3-0cda7d752acc".to_string());
-                assert_eq!(lm.source, "jarvis-modbus-exporter".to_string());
-                assert_eq!(lm.location, "My Home".to_string());
-                assert_eq!(lm.samples.len(), 1);
-                assert_eq!(lm.samples[0].entity_type, EntityType::Device);
-                assert_eq!(lm.samples[0].entity_name, "Sunny TriPower 8.0".to_string());
-                assert_eq!(lm.samples[0].sample_type, SampleType::ElectricityProduction);
-                assert_eq!(lm.samples[0].sample_name, "Total production".to_string());
-                assert_eq!(lm.samples[0].metric_type, MetricType::Counter);
-                assert_eq!(lm.samples[0].value, 9695872800.0f64);
+                assert_eq!(lm[0].id, "cc6e17bb-fd60-4dde-acc3-0cda7d752acc".to_string());
+                assert_eq!(lm[0].source, "jarvis-modbus-exporter".to_string());
+                assert_eq!(lm[0].location, "My Home".to_string());
+                assert_eq!(lm[0].samples.len(), 1);
+                assert_eq!(lm[0].samples[0].entity_type, EntityType::Device);
                 assert_eq!(
-                    lm.measured_at_time,
+                    lm[0].samples[0].entity_name,
+                    "Sunny TriPower 8.0".to_string()
+                );
+                assert_eq!(
+                    lm[0].samples[0].sample_type,
+                    SampleType::ElectricityProduction
+                );
+                assert_eq!(lm[0].samples[0].sample_name, "Total production".to_string());
+                assert_eq!(lm[0].samples[0].metric_type, MetricType::Counter);
+                assert_eq!(lm[0].samples[0].value, 9695872800.0f64);
+                assert_eq!(
+                    lm[0].measured_at_time,
                     DateTime::parse_from_rfc3339("2021-05-01T05:45:03.043614293Z").unwrap()
                 );
             }

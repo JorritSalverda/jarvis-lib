@@ -1,11 +1,11 @@
-Id: cc6e17bb-fd60-4dde-acc3-0cda7d752acc
-Source: jarvis-tp-link-hs-110-exporter
-Location: My Home
-Samples:
-- EntityType: ENTITY_TYPE_DEVICE
-  EntityName: TP-Link HS110
-  SampleType: SAMPLE_TYPE_ELECTRICITY_CONSUMPTION
-  SampleName: Oven
-  MetricType: METRIC_TYPE_COUNTER
-  Value: 9695872800.0
-MeasuredAtTime: 2021-05-01T05:45:03.043614293Z
+- Id: cc6e17bb-fd60-4dde-acc3-0cda7d752acc
+  Source: jarvis-tp-link-hs-110-exporter
+  Location: My Home
+  Samples:
+  - EntityType: ENTITY_TYPE_DEVICE
+    EntityName: TP-Link HS110
+    SampleType: SAMPLE_TYPE_ELECTRICITY_CONSUMPTION
+    SampleName: Oven
+    MetricType: METRIC_TYPE_COUNTER
+    Value: 9695872800.0
+  MeasuredAtTime: 2021-05-01T05:45:03.043614293Z
