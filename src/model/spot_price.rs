@@ -55,12 +55,6 @@ impl SpotPrice {
 }
 
 #[cfg(test)]
-#[ctor::ctor]
-fn init() {
-    env_logger::init();
-}
-
-#[cfg(test)]
 mod tests {
     use super::*;
     use std::error::Error;

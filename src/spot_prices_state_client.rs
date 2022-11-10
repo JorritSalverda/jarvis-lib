@@ -1,5 +1,5 @@
 use crate::model::*;
-use log::info;
+use tracing::info;
 use std::env;
 use std::error::Error;
 use std::fs;

@@ -1,5 +1,5 @@
 use crate::model::Measurement;
-use log::{debug, info};
+use tracing::{debug, info};
 use std::env;
 use std::error::Error;
 

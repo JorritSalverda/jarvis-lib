@@ -1,5 +1,5 @@
 use crate::model::*;
-use log::{debug, info};
+use tracing::{debug, info};
 use serde::de::DeserializeOwned;
 use serde_yaml;
 use std::env;

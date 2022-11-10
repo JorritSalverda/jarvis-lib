@@ -5,7 +5,7 @@ use kube::{
     api::{Api, PostParams},
     Client,
 };
-use log::{debug, info};
+use tracing::{debug, info};
 use std::collections::BTreeMap;
 use std::env;
 use std::error::Error;

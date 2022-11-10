@@ -2,7 +2,7 @@ use crate::model::spot_price::*;
 use chrono::prelude::*;
 use chrono::{naive::NaiveTime, DateTime, Duration, Utc, Weekday};
 use chrono_tz::Tz;
-use log::{debug, info};
+use tracing::{debug, info};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::error::Error;
