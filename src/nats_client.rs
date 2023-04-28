@@ -1,7 +1,7 @@
 use crate::model::Measurement;
-use tracing::{debug, info};
 use std::env;
 use std::error::Error;
+use tracing::{debug, info};
 
 pub struct NatsClientConfig {
     pub host: String,
@@ -73,6 +73,24 @@ impl NatsClient {
                 panic!(
                     "Failed to subscribe to nats subject {} for queue {}",
                     &self.config.subject, &self.config.queue
+                )
+            }))
+    }
+
+    pub fn subscribe(&mut self) -> Result<nats::Subscription, Box<dyn Error>> {
+        info!("Subscribing to nats subject {}", &self.config.subject);
+
+        self.connect()?;
+
+        Ok(self
+            .connection
+            .as_ref()
+            .unwrap()
+            .subscribe(&self.config.subject)
+            .unwrap_or_else(|_| {
+                panic!(
+                    "Failed to subscribe to nats subject {}",
+                    &self.config.subject
                 )
             }))
     }
