@@ -170,32 +170,35 @@ impl SpotPricePlanner {
                     plannable_local_time_slots.iter().any(|time_slot| {
                         let time_slot_from = local_from
                             .date_naive()
-                            .and_hms(
+                            .and_hms_opt(
                                 time_slot.from.hour(),
                                 time_slot.from.minute(),
                                 time_slot.from.second(),
                             )
+                            .unwrap()
                             .and_local_timezone(local_time_zone)
                             .unwrap();
 
                         let time_slot_till = if time_slot.till.hour() > 0 {
                             local_from
                                 .date_naive()
-                                .and_hms(
+                                .and_hms_opt(
                                     time_slot.till.hour(),
                                     time_slot.till.minute(),
                                     time_slot.till.second(),
                                 )
+                                .unwrap()
                                 .and_local_timezone(local_time_zone)
                                 .unwrap()
                         } else {
                             local_from
                                 .date_naive()
-                                .and_hms(
+                                .and_hms_opt(
                                     time_slot.till.hour(),
                                     time_slot.till.minute(),
                                     time_slot.till.second(),
                                 )
+                                .unwrap()
                                 .and_local_timezone(local_time_zone)
                                 .unwrap()
                                 + Duration::days(1)
