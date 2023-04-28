@@ -321,8 +321,8 @@ mod tests {
             &vec![SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 14).and_hms(11, 0, 0),
-                till: Utc.ymd(2022, 4, 14).and_hms(12, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 14, 11, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 14, 12, 0, 0).unwrap(),
                 market_price: 0.202,
                 market_price_tax: 0.0424053,
                 sourcing_markup_price: 0.017,
@@ -343,8 +343,8 @@ mod tests {
             &vec![SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 14).and_hms(11, 0, 0),
-                till: Utc.ymd(2022, 4, 14).and_hms(12, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 14, 11, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 14, 12, 0, 0).unwrap(),
                 market_price: 0.202,
                 market_price_tax: 0.0424053,
                 sourcing_markup_price: 0.017,
@@ -371,8 +371,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 14).and_hms(11, 0, 0),
-                    till: Utc.ymd(2022, 4, 14).and_hms(12, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 14, 11, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 14, 12, 0, 0).unwrap(),
                     market_price: 0.202,
                     market_price_tax: 0.0424053,
                     sourcing_markup_price: 0.017,
@@ -381,8 +381,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 14).and_hms(12, 0, 0),
-                    till: Utc.ymd(2022, 4, 14).and_hms(13, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 14, 12, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 14, 13, 0, 0).unwrap(),
                     market_price: 0.195,
                     market_price_tax: 0.0409899,
                     sourcing_markup_price: 0.017,
@@ -422,8 +422,8 @@ mod tests {
             plannable_local_time_slots: HashMap::from([(
                 Weekday::Thu,
                 vec![TimeSlot {
-                    from: NaiveTime::from_hms(14, 0, 0),
-                    till: NaiveTime::from_hms(16, 0, 0),
+                    from: NaiveTime::from_hms_opt(14, 0, 0).unwrap(),
+                    till: NaiveTime::from_hms_opt(16, 0, 0).unwrap(),
                 }],
             )]),
             local_time_zone: "Europe/Amsterdam".to_string(),
@@ -433,8 +433,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 14).and_hms(11, 0, 0),
-                till: Utc.ymd(2022, 4, 14).and_hms(12, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 14, 11, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 14, 12, 0, 0).unwrap(),
                 market_price: 0.202,
                 market_price_tax: 0.0424053,
                 sourcing_markup_price: 0.017,
@@ -443,8 +443,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 14).and_hms(12, 0, 0),
-                till: Utc.ymd(2022, 4, 14).and_hms(13, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 14, 12, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 14, 13, 0, 0).unwrap(),
                 market_price: 0.195,
                 market_price_tax: 0.0409899,
                 sourcing_markup_price: 0.017,
@@ -453,8 +453,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 14).and_hms(13, 0, 0),
-                till: Utc.ymd(2022, 4, 14).and_hms(14, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 14, 13, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 14, 14, 0, 0).unwrap(),
                 market_price: 0.194,
                 market_price_tax: 0.0406644,
                 sourcing_markup_price: 0.017,
@@ -463,8 +463,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 14).and_hms(14, 0, 0),
-                till: Utc.ymd(2022, 4, 14).and_hms(15, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 14, 14, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 14, 15, 0, 0).unwrap(),
                 market_price: 0.192,
                 market_price_tax: 0.0403179,
                 sourcing_markup_price: 0.017,
@@ -479,19 +479,19 @@ mod tests {
         assert_eq!(plannable_spot_prices.len(), 2);
         assert_eq!(
             plannable_spot_prices[0].from,
-            Utc.ymd(2022, 4, 14).and_hms(12, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 14, 12, 0, 0).unwrap()
         );
         assert_eq!(
             plannable_spot_prices[0].till,
-            Utc.ymd(2022, 4, 14).and_hms(13, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 14, 13, 0, 0).unwrap()
         );
         assert_eq!(
             plannable_spot_prices[1].from,
-            Utc.ymd(2022, 4, 14).and_hms(13, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 14, 13, 0, 0).unwrap()
         );
         assert_eq!(
             plannable_spot_prices[1].till,
-            Utc.ymd(2022, 4, 14).and_hms(14, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 14, 14, 0, 0).unwrap()
         );
 
         Ok(())
@@ -514,20 +514,20 @@ mod tests {
                     Weekday::Thu,
                     vec![
                         TimeSlot {
-                            from: NaiveTime::from_hms(14, 0, 0),
-                            till: NaiveTime::from_hms(16, 0, 0),
+                            from: NaiveTime::from_hms_opt(14, 0, 0).unwrap(),
+                            till: NaiveTime::from_hms_opt(16, 0, 0).unwrap(),
                         },
                         TimeSlot {
-                            from: NaiveTime::from_hms(23, 0, 0),
-                            till: NaiveTime::from_hms(0, 0, 0),
+                            from: NaiveTime::from_hms_opt(23, 0, 0).unwrap(),
+                            till: NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
                         },
                     ],
                 ),
                 (
                     Weekday::Fri,
                     vec![TimeSlot {
-                        from: NaiveTime::from_hms(0, 0, 0),
-                        till: NaiveTime::from_hms(2, 0, 0),
+                        from: NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
+                        till: NaiveTime::from_hms_opt(2, 0, 0).unwrap(),
                     }],
                 ),
             ]),
@@ -538,8 +538,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 14).and_hms(20, 0, 0),
-                till: Utc.ymd(2022, 4, 14).and_hms(21, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 14, 20, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 14, 21, 0, 0).unwrap(),
                 market_price: 0.265,
                 market_price_tax: 0.0557466,
                 sourcing_markup_price: 0.017,
@@ -548,8 +548,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 14).and_hms(21, 0, 0),
-                till: Utc.ymd(2022, 4, 14).and_hms(22, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 14, 21, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 14, 22, 0, 0).unwrap(),
                 market_price: 0.254,
                 market_price_tax: 0.0532728,
                 sourcing_markup_price: 0.017,
@@ -558,8 +558,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 14).and_hms(22, 0, 0),
-                till: Utc.ymd(2022, 4, 14).and_hms(23, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 14, 22, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 14, 23, 0, 0).unwrap(),
                 market_price: 0.231,
                 market_price_tax: 0.0484281,
                 sourcing_markup_price: 0.017,
@@ -568,8 +568,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 14).and_hms(23, 0, 0),
-                till: Utc.ymd(2022, 4, 15).and_hms(0, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 14, 23, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 15, 0, 0, 0).unwrap(),
                 market_price: 0.215,
                 market_price_tax: 0.045129,
                 sourcing_markup_price: 0.017,
@@ -578,8 +578,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 15).and_hms(0, 0, 0),
-                till: Utc.ymd(2022, 4, 15).and_hms(1, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 15, 0, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 15, 1, 0, 0).unwrap(),
                 market_price: 0.217,
                 market_price_tax: 0.04557,
                 sourcing_markup_price: 0.017,
@@ -588,8 +588,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 15).and_hms(1, 0, 0),
-                till: Utc.ymd(2022, 4, 15).and_hms(2, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 15, 1, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 15, 2, 0, 0).unwrap(),
                 market_price: 0.208,
                 market_price_tax: 0.0437535,
                 sourcing_markup_price: 0.017,
@@ -604,28 +604,28 @@ mod tests {
         assert_eq!(plannable_spot_prices.len(), 3);
         assert_eq!(
             plannable_spot_prices[0].from,
-            Utc.ymd(2022, 4, 14).and_hms(21, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 14, 21, 0, 0).unwrap()
         );
         assert_eq!(
             plannable_spot_prices[0].till,
-            Utc.ymd(2022, 4, 14).and_hms(22, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 14, 22, 0, 0).unwrap()
         );
         assert_eq!(
             plannable_spot_prices[1].from,
-            Utc.ymd(2022, 4, 14).and_hms(22, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 14, 22, 0, 0).unwrap()
         );
         assert_eq!(
             plannable_spot_prices[1].till,
-            Utc.ymd(2022, 4, 14).and_hms(23, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 14, 23, 0, 0).unwrap()
         );
 
         assert_eq!(
             plannable_spot_prices[2].from,
-            Utc.ymd(2022, 4, 14).and_hms(23, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 14, 23, 0, 0).unwrap()
         );
         assert_eq!(
             plannable_spot_prices[2].till,
-            Utc.ymd(2022, 4, 15).and_hms(0, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 15, 0, 0, 0).unwrap()
         );
 
         Ok(())
@@ -647,12 +647,12 @@ mod tests {
                     Weekday::Thu,
                     vec![
                         TimeSlot {
-                            from: NaiveTime::from_hms(0, 0, 0),
-                            till: NaiveTime::from_hms(7, 0, 0),
+                            from: NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
+                            till: NaiveTime::from_hms_opt(7, 0, 0).unwrap(),
                         },
                         TimeSlot {
-                            from: NaiveTime::from_hms(23, 0, 0),
-                            till: NaiveTime::from_hms(0, 0, 0),
+                            from: NaiveTime::from_hms_opt(23, 0, 0).unwrap(),
+                            till: NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
                         },
                     ],
                 ),
@@ -660,12 +660,12 @@ mod tests {
                     Weekday::Fri,
                     vec![
                         TimeSlot {
-                            from: NaiveTime::from_hms(0, 0, 0),
-                            till: NaiveTime::from_hms(7, 0, 0),
+                            from: NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
+                            till: NaiveTime::from_hms_opt(7, 0, 0).unwrap(),
                         },
                         TimeSlot {
-                            from: NaiveTime::from_hms(23, 0, 0),
-                            till: NaiveTime::from_hms(0, 0, 0),
+                            from: NaiveTime::from_hms_opt(23, 0, 0).unwrap(),
+                            till: NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
                         },
                     ],
                 ),
@@ -677,8 +677,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 21).and_hms(19, 0, 0),
-                till: Utc.ymd(2022, 4, 21).and_hms(20, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 21, 19, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 21, 20, 0, 0).unwrap(),
                 market_price: 0.224,
                 market_price_tax: 0.0469581,
                 sourcing_markup_price: 0.017,
@@ -687,8 +687,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 21).and_hms(20, 0, 0),
-                till: Utc.ymd(2022, 4, 21).and_hms(21, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 21, 20, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 21, 21, 0, 0).unwrap(),
                 market_price: 0.22,
                 market_price_tax: 0.0462924,
                 sourcing_markup_price: 0.017,
@@ -697,8 +697,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 21).and_hms(21, 0, 0),
-                till: Utc.ymd(2022, 4, 21).and_hms(22, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 21, 21, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 21, 22, 0, 0).unwrap(),
                 market_price: 0.2,
                 market_price_tax: 0.0419391,
                 sourcing_markup_price: 0.017,
@@ -707,8 +707,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 21).and_hms(22, 0, 0),
-                till: Utc.ymd(2022, 4, 21).and_hms(23, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 21, 22, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 21, 23, 0, 0).unwrap(),
                 market_price: 0.193,
                 market_price_tax: 0.040614,
                 sourcing_markup_price: 0.017,
@@ -717,8 +717,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 21).and_hms(23, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(0, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 21, 23, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 0, 0, 0).unwrap(),
                 market_price: 0.206,
                 market_price_tax: 0.04326,
                 sourcing_markup_price: 0.017,
@@ -727,8 +727,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(0, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(1, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 0, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 1, 0, 0).unwrap(),
                 market_price: 0.187,
                 market_price_tax: 0.0393078,
                 sourcing_markup_price: 0.017,
@@ -737,8 +737,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(1, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(2, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 1, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 2, 0, 0).unwrap(),
                 market_price: 0.187,
                 market_price_tax: 0.0392721,
                 sourcing_markup_price: 0.017,
@@ -747,8 +747,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(2, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(3, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 2, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 3, 0, 0).unwrap(),
                 market_price: 0.179,
                 market_price_tax: 0.0376761,
                 sourcing_markup_price: 0.017,
@@ -757,8 +757,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(3, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(4, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 3, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 4, 0, 0).unwrap(),
                 market_price: 0.176,
                 market_price_tax: 0.0369789,
                 sourcing_markup_price: 0.017,
@@ -767,8 +767,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(4, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(5, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 4, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 5, 0, 0).unwrap(),
                 market_price: 0.19,
                 market_price_tax: 0.03981180000000001,
                 sourcing_markup_price: 0.017,
@@ -777,8 +777,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(5, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(6, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 5, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 6, 0, 0).unwrap(),
                 market_price: 0.218,
                 market_price_tax: 0.0457947,
                 sourcing_markup_price: 0.017,
@@ -787,8 +787,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(6, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(7, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 6, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 7, 0, 0).unwrap(),
                 market_price: 0.24,
                 market_price_tax: 0.0503895,
                 sourcing_markup_price: 0.017,
@@ -797,8 +797,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(7, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(8, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 7, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 8, 0, 0).unwrap(),
                 market_price: 0.244,
                 market_price_tax: 0.051260999999999994,
                 sourcing_markup_price: 0.017,
@@ -807,8 +807,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(8, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(9, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 8, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 9, 0, 0).unwrap(),
                 market_price: 0.221,
                 market_price_tax: 0.0464205,
                 sourcing_markup_price: 0.017,
@@ -817,8 +817,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(9, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(10, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 9, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 10, 0, 0).unwrap(),
                 market_price: 0.197,
                 market_price_tax: 0.0412776,
                 sourcing_markup_price: 0.017,
@@ -827,8 +827,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(10, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(11, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 10, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 11, 0, 0).unwrap(),
                 market_price: 0.157,
                 market_price_tax: 0.0330561,
                 sourcing_markup_price: 0.017,
@@ -837,8 +837,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(11, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(12, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 11, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 12, 0, 0).unwrap(),
                 market_price: 0.15,
                 market_price_tax: 0.03141599999999999,
                 sourcing_markup_price: 0.017,
@@ -847,8 +847,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(12, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(13, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 12, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 13, 0, 0).unwrap(),
                 market_price: 0.102,
                 market_price_tax: 0.02142,
                 sourcing_markup_price: 0.017,
@@ -857,8 +857,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(13, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(14, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 13, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 14, 0, 0).unwrap(),
                 market_price: 0.1,
                 market_price_tax: 0.021,
                 sourcing_markup_price: 0.017,
@@ -867,8 +867,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(14, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(15, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 14, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 15, 0, 0).unwrap(),
                 market_price: 0.087,
                 market_price_tax: 0.0182217,
                 sourcing_markup_price: 0.017,
@@ -877,8 +877,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(15, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(16, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 15, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 16, 0, 0).unwrap(),
                 market_price: 0.119,
                 market_price_tax: 0.0249837,
                 sourcing_markup_price: 0.017,
@@ -887,8 +887,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(16, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(17, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 16, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 17, 0, 0).unwrap(),
                 market_price: 0.167,
                 market_price_tax: 0.03507,
                 sourcing_markup_price: 0.017,
@@ -897,8 +897,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(17, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(18, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 17, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 18, 0, 0).unwrap(),
                 market_price: 0.185,
                 market_price_tax: 0.038829,
                 sourcing_markup_price: 0.017,
@@ -907,8 +907,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(18, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(19, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 18, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 19, 0, 0).unwrap(),
                 market_price: 0.21,
                 market_price_tax: 0.0440181,
                 sourcing_markup_price: 0.017,
@@ -917,8 +917,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(19, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(20, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 19, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 20, 0, 0).unwrap(),
                 market_price: 0.21,
                 market_price_tax: 0.0440937,
                 sourcing_markup_price: 0.017,
@@ -927,8 +927,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(20, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(21, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 20, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 21, 0, 0).unwrap(),
                 market_price: 0.21,
                 market_price_tax: 0.0440286,
                 sourcing_markup_price: 0.017,
@@ -937,8 +937,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(21, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(22, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 21, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 22, 0, 0).unwrap(),
                 market_price: 0.192,
                 market_price_tax: 0.04032,
                 sourcing_markup_price: 0.017,
@@ -947,8 +947,8 @@ mod tests {
             SpotPrice {
                 id: None,
                 source: None,
-                from: Utc.ymd(2022, 4, 22).and_hms(22, 0, 0),
-                till: Utc.ymd(2022, 4, 22).and_hms(23, 0, 0),
+                from: Utc.with_ymd_and_hms(2022, 4, 22, 22, 0, 0).unwrap(),
+                till: Utc.with_ymd_and_hms(2022, 4, 22, 23, 0, 0).unwrap(),
                 market_price: 0.178,
                 market_price_tax: 0.0372855,
                 sourcing_markup_price: 0.017,
@@ -959,18 +959,18 @@ mod tests {
         // act
         let plannable_spot_prices = spot_price_planner.get_plannable_spot_prices(
             &future_spot_prices,
-            &Some(Utc.ymd(2022, 4, 21).and_hms(21, 32, 28)),
-            &Some(Utc.ymd(2022, 4, 22).and_hms(7, 32, 28)),
+            &Some(Utc.with_ymd_and_hms(2022, 4, 21, 21, 32, 28).unwrap()),
+            &Some(Utc.with_ymd_and_hms(2022, 4, 22, 7, 32, 28).unwrap()),
         )?;
 
         assert_eq!(plannable_spot_prices.len(), 7);
         assert_eq!(
             plannable_spot_prices[0].from,
-            Utc.ymd(2022, 4, 21).and_hms(22, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 21, 22, 0, 0).unwrap()
         );
         assert_eq!(
             plannable_spot_prices[6].till,
-            Utc.ymd(2022, 4, 22).and_hms(5, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 22, 5, 0, 0).unwrap()
         );
 
         Ok(())
@@ -991,8 +991,8 @@ mod tests {
             plannable_local_time_slots: HashMap::from([(
                 Weekday::Sat,
                 vec![TimeSlot {
-                    from: NaiveTime::from_hms(0, 0, 0),
-                    till: NaiveTime::from_hms(0, 0, 0),
+                    from: NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
+                    till: NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
                 }],
             )]),
             local_time_zone: "Europe/Amsterdam".to_string(),
@@ -1003,8 +1003,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(5, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(6, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 5, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 6, 0, 0).unwrap(),
                     market_price: 0.189,
                     market_price_tax: 0.03968579999999999,
                     sourcing_markup_price: 0.017,
@@ -1013,8 +1013,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(6, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(7, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 6, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 7, 0, 0).unwrap(),
                     market_price: 0.191,
                     market_price_tax: 0.0401352,
                     sourcing_markup_price: 0.017,
@@ -1023,8 +1023,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(7, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(8, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 7, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 8, 0, 0).unwrap(),
                     market_price: 0.19,
                     market_price_tax: 0.039816,
                     sourcing_markup_price: 0.017,
@@ -1033,8 +1033,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(8, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(9, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 8, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 9, 0, 0).unwrap(),
                     market_price: 0.173,
                     market_price_tax: 0.0362502,
                     sourcing_markup_price: 0.017,
@@ -1043,8 +1043,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(9, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(10, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 9, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 10, 0, 0).unwrap(),
                     market_price: 0.147,
                     market_price_tax: 0.030781800000000005,
                     sourcing_markup_price: 0.017,
@@ -1053,8 +1053,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(10, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(11, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 10, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 11, 0, 0).unwrap(),
                     market_price: 0.122,
                     market_price_tax: 0.0256179,
                     sourcing_markup_price: 0.017,
@@ -1063,8 +1063,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(11, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(12, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 11, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 12, 0, 0).unwrap(),
                     market_price: 0.069,
                     market_price_tax: 0.0145446,
                     sourcing_markup_price: 0.017,
@@ -1073,8 +1073,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(12, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(13, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 12, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 13, 0, 0).unwrap(),
                     market_price: 0.025,
                     market_price_tax: 0.0052605,
                     sourcing_markup_price: 0.017,
@@ -1083,8 +1083,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(13, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(14, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 13, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 14, 0, 0).unwrap(),
                     market_price: 0.027,
                     market_price_tax: 0.0056364,
                     sourcing_markup_price: 0.017,
@@ -1093,8 +1093,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(14, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(15, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 14, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 15, 0, 0).unwrap(),
                     market_price: 0.04,
                     market_price_tax: 0.0084672,
                     sourcing_markup_price: 0.017,
@@ -1103,8 +1103,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(15, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(16, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 15, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 16, 0, 0).unwrap(),
                     market_price: 0.066,
                     market_price_tax: 0.013826400000000004,
                     sourcing_markup_price: 0.017,
@@ -1113,8 +1113,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(16, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(17, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 16, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 17, 0, 0).unwrap(),
                     market_price: 0.108,
                     market_price_tax: 0.0226191,
                     sourcing_markup_price: 0.017,
@@ -1123,8 +1123,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(17, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(18, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 17, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 18, 0, 0).unwrap(),
                     market_price: 0.171,
                     market_price_tax: 0.0359499,
                     sourcing_markup_price: 0.017,
@@ -1133,8 +1133,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(18, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(19, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 18, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 19, 0, 0).unwrap(),
                     market_price: 0.195,
                     market_price_tax: 0.0409668,
                     sourcing_markup_price: 0.017,
@@ -1143,8 +1143,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(19, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(20, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 19, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 20, 0, 0).unwrap(),
                     market_price: 0.206,
                     market_price_tax: 0.0432201,
                     sourcing_markup_price: 0.017,
@@ -1153,8 +1153,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(20, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(21, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 20, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 21, 0, 0).unwrap(),
                     market_price: 0.194,
                     market_price_tax: 0.0408387,
                     sourcing_markup_price: 0.017,
@@ -1163,8 +1163,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(21, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(22, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 21, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 22, 0, 0).unwrap(),
                     market_price: 0.176,
                     market_price_tax: 0.0369264,
                     sourcing_markup_price: 0.017,
@@ -1173,8 +1173,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(22, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(23, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 22, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 23, 0, 0).unwrap(),
                     market_price: 0.167,
                     market_price_tax: 0.0350448,
                     sourcing_markup_price: 0.017,
@@ -1195,31 +1195,31 @@ mod tests {
         assert_eq!(response.spot_prices.len(), 5);
         assert_eq!(
             response.spot_prices[0].from,
-            Utc.ymd(2022, 4, 16).and_hms(11, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 16, 11, 0, 0).unwrap()
         );
         assert_eq!(response.spot_prices[0].market_price, 0.069);
 
         assert_eq!(
             response.spot_prices[1].from,
-            Utc.ymd(2022, 4, 16).and_hms(12, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 16, 12, 0, 0).unwrap()
         );
         assert_eq!(response.spot_prices[1].market_price, 0.025);
 
         assert_eq!(
             response.spot_prices[2].from,
-            Utc.ymd(2022, 4, 16).and_hms(13, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 16, 13, 0, 0).unwrap()
         );
         assert_eq!(response.spot_prices[2].market_price, 0.027);
 
         assert_eq!(
             response.spot_prices[3].from,
-            Utc.ymd(2022, 4, 16).and_hms(14, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 16, 14, 0, 0).unwrap()
         );
         assert_eq!(response.spot_prices[3].market_price, 0.04);
 
         assert_eq!(
             response.spot_prices[4].from,
-            Utc.ymd(2022, 4, 16).and_hms(15, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 16, 15, 0, 0).unwrap()
         );
         assert_eq!(response.spot_prices[4].market_price, 0.066);
 
@@ -1247,8 +1247,8 @@ mod tests {
             plannable_local_time_slots: HashMap::from([(
                 Weekday::Sat,
                 vec![TimeSlot {
-                    from: NaiveTime::from_hms(0, 0, 0),
-                    till: NaiveTime::from_hms(0, 0, 0),
+                    from: NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
+                    till: NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
                 }],
             )]),
             local_time_zone: "Europe/Amsterdam".to_string(),
@@ -1259,8 +1259,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(5, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(6, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 5, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 6, 0, 0).unwrap(),
                     market_price: 0.189,
                     market_price_tax: 0.03968579999999999,
                     sourcing_markup_price: 0.017,
@@ -1269,8 +1269,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(6, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(7, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 6, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 7, 0, 0).unwrap(),
                     market_price: 0.191,
                     market_price_tax: 0.0401352,
                     sourcing_markup_price: 0.017,
@@ -1279,8 +1279,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(7, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(8, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 7, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 8, 0, 0).unwrap(),
                     market_price: 0.19,
                     market_price_tax: 0.039816,
                     sourcing_markup_price: 0.017,
@@ -1289,8 +1289,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(8, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(9, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 8, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 9, 0, 0).unwrap(),
                     market_price: 0.173,
                     market_price_tax: 0.0362502,
                     sourcing_markup_price: 0.017,
@@ -1299,8 +1299,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(9, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(10, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 9, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 10, 0, 0).unwrap(),
                     market_price: 0.147,
                     market_price_tax: 0.030781800000000005,
                     sourcing_markup_price: 0.017,
@@ -1309,8 +1309,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(10, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(11, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 10, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 11, 0, 0).unwrap(),
                     market_price: 0.122,
                     market_price_tax: 0.0256179,
                     sourcing_markup_price: 0.017,
@@ -1319,8 +1319,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(11, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(12, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 11, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 12, 0, 0).unwrap(),
                     market_price: 0.069,
                     market_price_tax: 0.0145446,
                     sourcing_markup_price: 0.017,
@@ -1329,8 +1329,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(12, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(13, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 12, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 13, 0, 0).unwrap(),
                     market_price: 0.025,
                     market_price_tax: 0.0052605,
                     sourcing_markup_price: 0.017,
@@ -1339,8 +1339,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(13, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(14, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 13, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 14, 0, 0).unwrap(),
                     market_price: 0.027,
                     market_price_tax: 0.0056364,
                     sourcing_markup_price: 0.017,
@@ -1349,8 +1349,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(14, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(15, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 14, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 15, 0, 0).unwrap(),
                     market_price: 0.04,
                     market_price_tax: 0.0084672,
                     sourcing_markup_price: 0.017,
@@ -1359,8 +1359,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(15, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(16, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 15, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 16, 0, 0).unwrap(),
                     market_price: 0.066,
                     market_price_tax: 0.013826400000000004,
                     sourcing_markup_price: 0.017,
@@ -1369,8 +1369,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(16, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(17, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 16, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 17, 0, 0).unwrap(),
                     market_price: 0.108,
                     market_price_tax: 0.0226191,
                     sourcing_markup_price: 0.017,
@@ -1379,8 +1379,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(17, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(18, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 17, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 18, 0, 0).unwrap(),
                     market_price: 0.171,
                     market_price_tax: 0.0359499,
                     sourcing_markup_price: 0.017,
@@ -1389,8 +1389,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(18, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(19, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 18, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 19, 0, 0).unwrap(),
                     market_price: 0.195,
                     market_price_tax: 0.0409668,
                     sourcing_markup_price: 0.017,
@@ -1399,8 +1399,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(19, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(20, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 19, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 20, 0, 0).unwrap(),
                     market_price: 0.206,
                     market_price_tax: 0.0432201,
                     sourcing_markup_price: 0.017,
@@ -1409,8 +1409,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(20, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(21, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 20, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 21, 0, 0).unwrap(),
                     market_price: 0.194,
                     market_price_tax: 0.0408387,
                     sourcing_markup_price: 0.017,
@@ -1419,8 +1419,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(21, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(22, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 21, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 22, 0, 0).unwrap(),
                     market_price: 0.176,
                     market_price_tax: 0.0369264,
                     sourcing_markup_price: 0.017,
@@ -1429,8 +1429,8 @@ mod tests {
                 SpotPrice {
                     id: None,
                     source: None,
-                    from: Utc.ymd(2022, 4, 16).and_hms(22, 0, 0),
-                    till: Utc.ymd(2022, 4, 16).and_hms(23, 0, 0),
+                    from: Utc.with_ymd_and_hms(2022, 4, 16, 22, 0, 0).unwrap(),
+                    till: Utc.with_ymd_and_hms(2022, 4, 16, 23, 0, 0).unwrap(),
                     market_price: 0.167,
                     market_price_tax: 0.0350448,
                     sourcing_markup_price: 0.017,
@@ -1451,19 +1451,19 @@ mod tests {
         assert_eq!(response.spot_prices.len(), 3);
         assert_eq!(
             response.spot_prices[0].from,
-            Utc.ymd(2022, 4, 16).and_hms(18, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 16, 18, 0, 0).unwrap()
         );
         assert_eq!(response.spot_prices[0].market_price, 0.195);
 
         assert_eq!(
             response.spot_prices[1].from,
-            Utc.ymd(2022, 4, 16).and_hms(19, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 16, 19, 0, 0).unwrap()
         );
         assert_eq!(response.spot_prices[1].market_price, 0.206);
 
         assert_eq!(
             response.spot_prices[2].from,
-            Utc.ymd(2022, 4, 16).and_hms(20, 0, 0)
+            Utc.with_ymd_and_hms(2022, 4, 16, 20, 0, 0).unwrap()
         );
         assert_eq!(response.spot_prices[2].market_price, 0.194);
 

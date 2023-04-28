@@ -1,10 +1,10 @@
 use crate::model::*;
-use tracing::{debug, info};
 use serde::de::DeserializeOwned;
 use serde_yaml;
 use std::env;
 use std::error::Error;
 use std::fs;
+use tracing::{debug, info};
 
 pub trait SetDefaults {
     fn set_defaults(&mut self);
@@ -121,7 +121,7 @@ mod tests {
                 .get(&Weekday::Thu)
                 .unwrap()[0]
                 .from,
-            NaiveTime::from_hms(0, 0, 0)
+            NaiveTime::from_hms_opt(0, 0, 0).unwrap()
         );
         assert_eq!(
             config
@@ -129,7 +129,7 @@ mod tests {
                 .get(&Weekday::Thu)
                 .unwrap()[0]
                 .till,
-            NaiveTime::from_hms(7, 0, 0)
+            NaiveTime::from_hms_opt(7, 0, 0).unwrap()
         );
         assert_eq!(
             config
@@ -137,7 +137,7 @@ mod tests {
                 .get(&Weekday::Thu)
                 .unwrap()[1]
                 .from,
-            NaiveTime::from_hms(23, 0, 0)
+            NaiveTime::from_hms_opt(23, 0, 0).unwrap()
         );
         assert_eq!(
             config
@@ -145,7 +145,7 @@ mod tests {
                 .get(&Weekday::Thu)
                 .unwrap()[1]
                 .till,
-            NaiveTime::from_hms(0, 0, 0)
+            NaiveTime::from_hms_opt(0, 0, 0).unwrap()
         );
 
         assert_eq!(
@@ -162,7 +162,7 @@ mod tests {
                 .get(&Weekday::Sat)
                 .unwrap()[0]
                 .from,
-            NaiveTime::from_hms(0, 0, 0)
+            NaiveTime::from_hms_opt(0, 0, 0).unwrap()
         );
         assert_eq!(
             config
@@ -170,7 +170,7 @@ mod tests {
                 .get(&Weekday::Sat)
                 .unwrap()[0]
                 .till,
-            NaiveTime::from_hms(0, 0, 0)
+            NaiveTime::from_hms_opt(0, 0, 0).unwrap()
         );
     }
 }
