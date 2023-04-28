@@ -2,10 +2,10 @@ use crate::model::spot_price::*;
 use chrono::prelude::*;
 use chrono::{naive::NaiveTime, DateTime, Duration, Utc, Weekday};
 use chrono_tz::Tz;
-use tracing::{debug, info};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::error::Error;
+use tracing::{debug, info};
 
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
 pub enum PlanningStrategy {
@@ -59,13 +59,18 @@ impl PlanningResponse {
     }
 }
 
-fn total_price_for_load(spot_prices: &[SpotPrice], load_profile: &LoadProfile, get_price_fn: Option<fn(&SpotPrice) -> f64>) -> f64 {
+fn total_price_for_load(
+    spot_prices: &[SpotPrice],
+    load_profile: &LoadProfile,
+    get_price_fn: Option<fn(&SpotPrice) -> f64>,
+) -> f64 {
     if !spot_prices.is_empty() && !load_profile.sections.is_empty() {
         let total_required_seconds = load_profile.total_duration_seconds() as usize;
 
         let mut spot_price_per_second: Vec<f64> = vec![];
         for spot_price in spot_prices {
-            let price_per_second = get_price_fn.unwrap_or(|sp| sp.total_price())(spot_price) / (3600_f64 * 1000_f64);
+            let price_per_second =
+                get_price_fn.unwrap_or(|sp| sp.total_price())(spot_price) / (3600_f64 * 1000_f64);
 
             let seconds_still_needed = std::cmp::min(
                 spot_price.duration_seconds() as usize,
@@ -163,24 +168,37 @@ impl SpotPricePlanner {
                     .get(&local_from.weekday())
                 {
                     plannable_local_time_slots.iter().any(|time_slot| {
-                        let time_slot_from = local_from.date().and_hms(
-                            time_slot.from.hour(),
-                            time_slot.from.minute(),
-                            time_slot.from.second(),
-                        );
+                        let time_slot_from = local_from
+                            .date_naive()
+                            .and_hms(
+                                time_slot.from.hour(),
+                                time_slot.from.minute(),
+                                time_slot.from.second(),
+                            )
+                            .and_local_timezone(local_time_zone)
+                            .unwrap();
 
                         let time_slot_till = if time_slot.till.hour() > 0 {
-                            local_from.date().and_hms(
-                                time_slot.till.hour(),
-                                time_slot.till.minute(),
-                                time_slot.till.second(),
-                            )
+                            local_from
+                                .date_naive()
+                                .and_hms(
+                                    time_slot.till.hour(),
+                                    time_slot.till.minute(),
+                                    time_slot.till.second(),
+                                )
+                                .and_local_timezone(local_time_zone)
+                                .unwrap()
                         } else {
-                            local_from.date().and_hms(
-                                time_slot.till.hour(),
-                                time_slot.till.minute(),
-                                time_slot.till.second(),
-                            ) + Duration::days(1)
+                            local_from
+                                .date_naive()
+                                .and_hms(
+                                    time_slot.till.hour(),
+                                    time_slot.till.minute(),
+                                    time_slot.till.second(),
+                                )
+                                .and_local_timezone(local_time_zone)
+                                .unwrap()
+                                + Duration::days(1)
                         };
 
                         local_from >= time_slot_from
