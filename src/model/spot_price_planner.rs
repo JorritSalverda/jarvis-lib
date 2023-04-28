@@ -296,6 +296,7 @@ impl SpotPricePlanner {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn total_price_for_load_returns_zero_for_empty_spot_prices() {

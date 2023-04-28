@@ -1,8 +1,8 @@
 use crate::model::*;
-use tracing::info;
 use std::env;
 use std::error::Error;
 use std::fs;
+use tracing::info;
 
 pub struct SpotPricesStateClientConfig {
     state_file_path: String,

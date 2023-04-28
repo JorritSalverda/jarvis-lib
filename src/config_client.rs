@@ -67,6 +67,7 @@ mod tests {
     use crate::model::EntityType;
     use chrono::naive::NaiveTime;
     use chrono::Weekday;
+    use pretty_assertions::assert_eq;
     use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Debug)]

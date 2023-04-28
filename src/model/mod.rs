@@ -20,6 +20,7 @@ pub use crate::model::spot_prices_state::*;
 mod tests {
     use super::*;
     use chrono::{DateTime, Utc};
+    use pretty_assertions::assert_eq;
     use serde_json;
     use serde_yaml;
 
