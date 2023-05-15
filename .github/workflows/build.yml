@@ -68,7 +68,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
-      - run: cargo install --version 1.1.0 cargo-bump
+      - run: cargo install --force --version 1.1.0 cargo-bump
       - run: cargo bump ${GITVERSION_SEMVER}
       - run: cargo clippy --no-deps -- --deny "warnings"
       - run: cargo test
