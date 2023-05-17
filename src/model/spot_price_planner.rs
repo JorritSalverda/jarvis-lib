@@ -408,8 +408,8 @@ mod tests {
         assert_eq!(total_price, 2.0207701999998684); // round error, should be 2.0207702
     }
 
-    #[tokio::test]
-    async fn get_plannable_spot_prices_returns_only_spot_prices_fitting_in_plannable_time_slots(
+    #[test]
+    fn get_plannable_spot_prices_returns_only_spot_prices_fitting_in_plannable_time_slots(
     ) -> Result<(), Box<dyn Error>> {
         let load_profile = LoadProfile {
             sections: vec![LoadProfileSection {
@@ -498,8 +498,8 @@ mod tests {
         Ok(())
     }
 
-    #[tokio::test]
-    async fn get_plannable_spot_prices_returns_only_spot_prices_fitting_in_plannable_time_slots_when_includes_next_day(
+    #[test]
+    fn get_plannable_spot_prices_returns_only_spot_prices_fitting_in_plannable_time_slots_when_includes_next_day(
     ) -> Result<(), Box<dyn Error>> {
         let load_profile = LoadProfile {
             sections: vec![LoadProfileSection {
@@ -632,8 +632,8 @@ mod tests {
         Ok(())
     }
 
-    #[tokio::test]
-    async fn get_plannable_spot_prices_with_before() -> Result<(), Box<dyn Error>> {
+    #[test]
+    fn get_plannable_spot_prices_with_before() -> Result<(), Box<dyn Error>> {
         let load_profile = LoadProfile {
             sections: vec![LoadProfileSection {
                 duration_seconds: 18000,
@@ -977,8 +977,8 @@ mod tests {
         Ok(())
     }
 
-    #[tokio::test]
-    async fn get_best_spot_prices_returns_cheapest_combined_block_spot_of_prices_amounting_to_enough_duration_ordered_by_time_for_lowest_price_strategy(
+    #[test]
+    fn get_best_spot_prices_returns_cheapest_combined_block_spot_of_prices_amounting_to_enough_duration_ordered_by_time_for_lowest_price_strategy(
     ) -> Result<(), Box<dyn Error>> {
         let load_profile = LoadProfile {
             sections: vec![LoadProfileSection {
@@ -1227,8 +1227,8 @@ mod tests {
         Ok(())
     }
 
-    #[tokio::test]
-    async fn get_best_spot_prices_returns_most_expensive_combined_block_spot_of_prices_amounting_to_enough_duration_ordered_by_time_for_highest_price_strategy(
+    #[test]
+    fn get_best_spot_prices_returns_most_expensive_combined_block_spot_of_prices_amounting_to_enough_duration_ordered_by_time_for_highest_price_strategy(
     ) -> Result<(), Box<dyn Error>> {
         let load_profile = LoadProfile {
             sections: vec![
