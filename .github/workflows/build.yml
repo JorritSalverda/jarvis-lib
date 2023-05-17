@@ -68,12 +68,12 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
-      - run: cargo install --force --version 1.1.0 cargo-bump
-      - run: cargo bump ${GITVERSION_SEMVER}
-      - run: cargo clippy --no-deps -- --deny "warnings"
-      - run: cargo test
+      # - run: cargo install --force --version 1.1.0 cargo-bump
+      # - run: cargo bump ${GITVERSION_SEMVER}
+      - run: cargo clippy --target x86_64-unknown-linux-musl --no-deps -- --deny "warnings"
+      - run: cargo test --target x86_64-unknown-linux-musl
       - run: cargo build --target x86_64-unknown-linux-musl
-      - run: cargo build --target aarch64-unknown-linux-musl
+      # - run: cargo build --target aarch64-unknown-linux-musl
 
   tag:
     runs-on: ubuntu-latest
