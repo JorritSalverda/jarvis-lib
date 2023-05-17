@@ -172,14 +172,13 @@ impl StateClient {
 mod tests {
     use super::*;
     use crate::model::{EntityType, MetricType, SampleType};
-    use async_std::task;
     use chrono::DateTime;
     use pretty_assertions::assert_eq;
 
     #[test]
     #[ignore]
     fn read_measurement_from_file_returns_deserialized_test_file() {
-        let kube_client: kube::Client = match task::block_on(Client::try_default()) {
+        let kube_client: kube::Client = match tokio_test::block_on(Client::try_default()) {
             Ok(c) => c,
             Err(e) => panic!("Getting kube_client errored: {}", e),
         };
@@ -229,7 +228,7 @@ mod tests {
     #[test]
     #[ignore]
     fn get_last_measurement() {
-        let kube_client: kube::Client = match task::block_on(Client::try_default()) {
+        let kube_client: kube::Client = match tokio_test::block_on(Client::try_default()) {
             Ok(c) => c,
             Err(e) => panic!("Getting kube_client errored: {}", e),
         };
@@ -248,7 +247,7 @@ mod tests {
             .unwrap(),
         );
 
-        let config_map = task::block_on(state_client.get_state_configmap());
+        let config_map = tokio_test::block_on(state_client.get_state_configmap());
 
         match config_map {
             Ok(cm) => {
