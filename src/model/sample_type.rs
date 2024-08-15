@@ -8,6 +8,8 @@ pub enum SampleType {
     ElectricityConsumption,
     #[serde(rename = "SAMPLE_TYPE_ELECTRICITY_PRODUCTION")]
     ElectricityProduction,
+    #[serde(rename = "SAMPLE_TYPE_BATTERY_SOC")]
+    BatteryStateOfCharge,
     #[serde(rename = "SAMPLE_TYPE_GAS_CONSUMPTION")]
     Energy,
     #[serde(rename = "SAMPLE_TYPE_FLOW")]
