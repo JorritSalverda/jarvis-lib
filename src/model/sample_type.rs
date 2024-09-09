@@ -38,4 +38,6 @@ pub enum SampleType {
     DistanceTraveled,
     #[serde(rename = "SAMPLE_TYPE_AVAILABILITY")]
     Availability,
+    #[serde(rename = "SAMPLE_TYPE_BATTERY_CHARGE_RATE")]
+    ElectricityChargeRate,
 }
