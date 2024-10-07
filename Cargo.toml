@@ -19,5 +19,5 @@ serde_yaml = "0.9"
 tracing = "0.1"
 
 [dev-dependencies]
-pretty_assertions = "1.4"
+assert2 = "0.3.15"
 tokio-test = "0.4"

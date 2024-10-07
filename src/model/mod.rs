@@ -19,15 +19,20 @@ pub use crate::model::spot_prices_state::*;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use assert2::{check, let_assert};
     use chrono::{DateTime, Utc};
-    use pretty_assertions::assert_eq;
-    use serde_json;
-    use serde_yaml;
+
+    #[cfg(target_os = "linux")]
+    macro_rules! test_case {
+        ($f:expr) => {
+            include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/", $f))
+        };
+    }
 
     #[test]
     fn to_json() {
-        assert_eq!(
-            serde_json::to_string_pretty(&Measurement {
+        let_assert!(
+            Ok(measurement) = serde_json::to_string_pretty(&Measurement {
                 id: "cc6e17bb-fd60-4dde-acc3-0cda7d752acc".into(),
                 source: "jarvis-tp-link-hs-110-exporter".into(),
                 location: "My Home".into(),
@@ -37,88 +42,55 @@ mod tests {
                     sample_type: SampleType::ElectricityConsumption,
                     sample_name: "Oven".into(),
                     metric_type: MetricType::Counter,
-                    value: 9695872800.0
+                    value: 9695872800.0,
                 }],
                 measured_at_time: DateTime::parse_from_rfc3339("2021-05-01T05:45:03.043614293Z")
                     .unwrap()
                     .with_timezone(&Utc),
             })
-            .unwrap(),
-            r#"{
-  "Id": "cc6e17bb-fd60-4dde-acc3-0cda7d752acc",
-  "Source": "jarvis-tp-link-hs-110-exporter",
-  "Location": "My Home",
-  "Samples": [
-    {
-      "EntityType": "ENTITY_TYPE_DEVICE",
-      "EntityName": "TP-Link HS110",
-      "SampleType": "SAMPLE_TYPE_ELECTRICITY_CONSUMPTION",
-      "SampleName": "Oven",
-      "MetricType": "METRIC_TYPE_COUNTER",
-      "Value": 9695872800.0
-    }
-  ],
-  "MeasuredAtTime": "2021-05-01T05:45:03.043614293Z"
-}"#
         );
+
+        check!(measurement == test_case!("test-measurement.json").trim());
     }
 
     #[test]
     fn from_json() {
-        let measurement = serde_json::from_str::<Measurement>(
-            r#"{
-  "Id": "cc6e17bb-fd60-4dde-acc3-0cda7d752acc",
-  "Source": "jarvis-tp-link-hs-110-exporter",
-  "Location": "My Home",
-  "Samples": [
-    {
-      "EntityType": "ENTITY_TYPE_DEVICE",
-      "EntityName": "TP-Link HS110",
-      "SampleType": "SAMPLE_TYPE_ELECTRICITY_CONSUMPTION",
-      "SampleName": "Oven",
-      "MetricType": "METRIC_TYPE_COUNTER",
-      "Value": 9695872800.0
-    }
-  ],
-  "MeasuredAtTime": "2021-05-01T05:45:03.043614293Z"
-}"#,
-        )
-        .unwrap();
+        let_assert!(
+            Ok(Measurement {
+                id,
+                source,
+                location,
+                samples,
+                measured_at_time,
+            }) = serde_json::from_str(test_case!("test-measurement.json"))
+        );
 
-        assert_eq!(measurement.id, "cc6e17bb-fd60-4dde-acc3-0cda7d752acc");
-        assert_eq!(measurement.source, "jarvis-tp-link-hs-110-exporter");
-        assert_eq!(measurement.location, "My Home");
-        assert_eq!(measurement.samples.len(), 1);
-        assert_eq!(
-            measurement.samples.get(0).unwrap().entity_type,
-            EntityType::Device
-        );
-        assert_eq!(
-            measurement.samples.get(0).unwrap().entity_name,
-            "TP-Link HS110"
-        );
-        assert_eq!(
-            measurement.samples.get(0).unwrap().sample_type,
-            SampleType::ElectricityConsumption
-        );
-        assert_eq!(measurement.samples.get(0).unwrap().sample_name, "Oven");
-        assert_eq!(
-            measurement.samples.get(0).unwrap().metric_type,
-            MetricType::Counter
-        );
-        assert_eq!(measurement.samples.get(0).unwrap().value, 9695872800.0);
-        assert_eq!(
-            measurement.measured_at_time,
-            DateTime::parse_from_rfc3339("2021-05-01T05:45:03.043614293Z")
-                .unwrap()
-                .with_timezone(&Utc)
+        check!(id == "cc6e17bb-fd60-4dde-acc3-0cda7d752acc");
+        check!(source == "jarvis-tp-link-hs-110-exporter");
+        check!(location == "My Home");
+        check!(samples.len() == 1);
+
+        let_assert!([sample, ..] = samples.as_slice());
+
+        check!(sample.entity_type == EntityType::Device);
+        check!(sample.entity_name == "TP-Link HS110");
+        check!(sample.sample_type == SampleType::ElectricityConsumption);
+        check!(sample.sample_name == "Oven");
+        check!(sample.metric_type == MetricType::Counter);
+        check!(sample.value == 9695872800.0);
+
+        check!(
+            measured_at_time
+                == DateTime::parse_from_rfc3339("2021-05-01T05:45:03.043614293Z")
+                    .unwrap()
+                    .with_timezone(&Utc)
         );
     }
 
     #[test]
     fn to_yaml() {
-        assert_eq!(
-            serde_yaml::to_string(&Measurement {
+        let_assert!(
+            Ok(str) = serde_yaml::to_string(&Measurement {
                 id: "cc6e17bb-fd60-4dde-acc3-0cda7d752acc".into(),
                 source: "jarvis-tp-link-hs-110-exporter".into(),
                 location: "My Home".into(),
@@ -128,71 +100,45 @@ mod tests {
                     sample_type: SampleType::ElectricityConsumption,
                     sample_name: "Oven".into(),
                     metric_type: MetricType::Counter,
-                    value: 9695872800.0
+                    value: 9695872800.0,
                 }],
                 measured_at_time: DateTime::parse_from_rfc3339("2021-05-01T05:45:03.043614293Z")
                     .unwrap()
                     .with_timezone(&Utc),
             })
-            .unwrap(),
-            r#"Id: cc6e17bb-fd60-4dde-acc3-0cda7d752acc
-Source: jarvis-tp-link-hs-110-exporter
-Location: My Home
-Samples:
-- EntityType: ENTITY_TYPE_DEVICE
-  EntityName: TP-Link HS110
-  SampleType: SAMPLE_TYPE_ELECTRICITY_CONSUMPTION
-  SampleName: Oven
-  MetricType: METRIC_TYPE_COUNTER
-  Value: 9695872800.0
-MeasuredAtTime: 2021-05-01T05:45:03.043614293Z
-"#
         );
+
+        check!(str == test_case!("test-measurement.yaml"));
     }
 
     #[test]
     fn from_yaml() {
-        let measurement = serde_yaml::from_str::<Measurement>(
-            r#"---
-Id: cc6e17bb-fd60-4dde-acc3-0cda7d752acc
-Source: jarvis-tp-link-hs-110-exporter
-Location: My Home
-Samples:
-  - EntityType: ENTITY_TYPE_DEVICE
-    EntityName: TP-Link HS110
-    SampleType: SAMPLE_TYPE_ELECTRICITY_CONSUMPTION
-    SampleName: Oven
-    MetricType: METRIC_TYPE_COUNTER
-    Value: 9695872800.0
-MeasuredAtTime: "2021-05-01T05:45:03.043614293Z"
-"#,
-        )
-        .unwrap();
+        let_assert!(
+            Ok(Measurement {
+                id,
+                source,
+                location,
+                samples,
+                measured_at_time,
+            }) = serde_yaml::from_str(test_case!("test-measurement.yaml"))
+        );
 
-        assert_eq!(measurement.id, "cc6e17bb-fd60-4dde-acc3-0cda7d752acc");
-        assert_eq!(measurement.source, "jarvis-tp-link-hs-110-exporter");
-        assert_eq!(measurement.location, "My Home");
-        assert_eq!(measurement.samples.len(), 1);
+        assert_eq!(id, "cc6e17bb-fd60-4dde-acc3-0cda7d752acc");
+        assert_eq!(source, "jarvis-tp-link-hs-110-exporter");
+        assert_eq!(location, "My Home");
+        assert_eq!(samples.len(), 1);
+
+        let_assert!([first, ..] = samples.as_slice());
+
+        assert_eq!(first.entity_type, EntityType::Device);
+        assert_eq!(first.entity_name, "TP-Link HS110");
+        assert_eq!(first.sample_type, SampleType::ElectricityConsumption);
+        assert_eq!(first.sample_name, "Oven");
+        assert_eq!(first.metric_type, MetricType::Counter);
+        assert_eq!(first.value, 9695872800.0);
+
         assert_eq!(
-            measurement.samples.get(0).unwrap().entity_type,
-            EntityType::Device
-        );
-        assert_eq!(
-            measurement.samples.get(0).unwrap().entity_name,
-            "TP-Link HS110"
-        );
-        assert_eq!(
-            measurement.samples.get(0).unwrap().sample_type,
-            SampleType::ElectricityConsumption
-        );
-        assert_eq!(measurement.samples.get(0).unwrap().sample_name, "Oven");
-        assert_eq!(
-            measurement.samples.get(0).unwrap().metric_type,
-            MetricType::Counter
-        );
-        assert_eq!(measurement.samples.get(0).unwrap().value, 9695872800.0);
-        assert_eq!(
-            measurement.measured_at_time,
+            measured_at_time,
             DateTime::parse_from_rfc3339("2021-05-01T05:45:03.043614293Z")
                 .unwrap()
                 .with_timezone(&Utc)
