@@ -56,19 +56,21 @@ impl SpotPrice {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use pretty_assertions::assert_eq;
-    use std::error::Error;
+    use super::SpotPriceResponse;
+    use assert2::{check, let_assert};
     use std::fs;
 
     #[test]
-    fn deserialize_spot_price_response() -> Result<(), Box<dyn Error>> {
-        let spot_price_predictions_content = fs::read_to_string("spot_price_predictions.json")?;
+    fn deserialize_spot_price_response() {
+        let_assert!(
+            Ok(spot_price_predictions_content) = fs::read_to_string("spot_price_predictions.json")
+        );
 
-        let spot_price_response: SpotPriceResponse =
-            serde_json::from_str(&spot_price_predictions_content)?;
+        let_assert!(
+            Ok(SpotPriceResponse { data, .. }) =
+                serde_json::from_str(&spot_price_predictions_content)
+        );
 
-        assert_eq!(spot_price_response.data.market_prices_electricity.len(), 24);
-        Ok(())
+        check!(data.market_prices_electricity.len() == 24);
     }
 }

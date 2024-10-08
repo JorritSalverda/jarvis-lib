@@ -72,16 +72,12 @@ impl StateClient {
     }
 
     pub fn read_state(&self) -> Result<Option<Vec<Measurement>>, Box<dyn std::error::Error>> {
-        let state_file_contents = match fs::read_to_string(&self.config.measurement_file_path) {
-            Ok(c) => c,
-            Err(_) => return Ok(Option::None),
+        let Ok(last_measurements) = fs::read_to_string(&self.config.measurement_file_path)
+            .as_deref()
+            .map_or(Ok(None), serde_yaml::from_str)
+        else {
+            return Ok(None);
         };
-
-        let last_measurements: Option<Vec<Measurement>> =
-            match serde_yaml::from_str(&state_file_contents) {
-                Ok(lm) => Some(lm),
-                Err(_) => return Ok(Option::None),
-            };
 
         info!(
             "Read previous measurements from state file at {}",
@@ -169,66 +165,53 @@ impl StateClient {
 mod tests {
     use super::*;
     use crate::model::{EntityType, MetricType, SampleType};
+    use assert2::{check, let_assert};
     use chrono::DateTime;
-    use pretty_assertions::assert_eq;
 
     #[test]
     #[ignore]
     fn read_measurement_from_file_returns_deserialized_test_file() {
-        let kube_client: kube::Client = match tokio_test::block_on(Client::try_default()) {
-            Ok(c) => c,
-            Err(e) => panic!("Getting kube_client errored: {}", e),
-        };
+        let_assert!(Ok(kube_client) = tokio_test::block_on(Client::try_default()));
 
         let measurement_file_path = "test-measurement.yaml".to_string();
         let measurement_file_configmap_name = "jarvis-modbus-exporter-sunny".to_string();
         let current_namespace = "jarvis".to_string();
 
-        let state_client = StateClient::new(
-            StateClientConfig::new(
+        let_assert!(
+            Ok(state_client) = StateClientConfig::new(
                 kube_client,
                 measurement_file_path,
                 measurement_file_configmap_name,
                 current_namespace,
             )
-            .unwrap(),
         );
 
-        let last_measurement = state_client.read_state().unwrap();
-        match last_measurement {
-            Some(lm) => {
-                assert_eq!(lm[0].id, "cc6e17bb-fd60-4dde-acc3-0cda7d752acc".to_string());
-                assert_eq!(lm[0].source, "jarvis-modbus-exporter".to_string());
-                assert_eq!(lm[0].location, "My Home".to_string());
-                assert_eq!(lm[0].samples.len(), 1);
-                assert_eq!(lm[0].samples[0].entity_type, EntityType::Device);
-                assert_eq!(
-                    lm[0].samples[0].entity_name,
-                    "Sunny TriPower 8.0".to_string()
-                );
-                assert_eq!(
-                    lm[0].samples[0].sample_type,
-                    SampleType::ElectricityProduction
-                );
-                assert_eq!(lm[0].samples[0].sample_name, "Total production".to_string());
-                assert_eq!(lm[0].samples[0].metric_type, MetricType::Counter);
-                assert_eq!(lm[0].samples[0].value, 9695872800.0f64);
-                assert_eq!(
-                    lm[0].measured_at_time,
-                    DateTime::parse_from_rfc3339("2021-05-01T05:45:03.043614293Z").unwrap()
-                );
-            }
-            None => panic!("read_state returned no measurement"),
-        }
+        let_assert!(Ok(Some(last_measurement)) = StateClient::new(state_client).read_state());
+        let_assert!([measurement, ..] = last_measurement.as_slice());
+
+        check!(measurement.id == "cc6e17bb-fd60-4dde-acc3-0cda7d752acc");
+        check!(measurement.source == "jarvis-modbus-exporter");
+        check!(measurement.location == "My Home");
+
+        let_assert!([sample, ..] = measurement.samples.as_slice());
+
+        check!(sample.entity_type == EntityType::Device);
+        check!(sample.entity_name == "Sunny TriPower 8.0");
+        check!(sample.sample_type == SampleType::ElectricityProduction);
+        check!(sample.sample_name == "Total production");
+        check!(sample.metric_type == MetricType::Counter);
+        check!(sample.value == 9695872800.0f64);
+
+        check!(
+            measurement.measured_at_time
+                == DateTime::parse_from_rfc3339("2021-05-01T05:45:03.043614293Z").unwrap()
+        );
     }
 
     #[test]
     #[ignore]
     fn get_last_measurement() {
-        let kube_client: kube::Client = match tokio_test::block_on(Client::try_default()) {
-            Ok(c) => c,
-            Err(e) => panic!("Getting kube_client errored: {}", e),
-        };
+        let_assert!(Ok(kube_client) = tokio_test::block_on(Client::try_default()));
 
         let measurement_file_path = "/configs/last-measurement.yaml".to_string();
         let measurement_file_configmap_name = "jarvis-modbus-exporter-sunny".to_string();
@@ -244,13 +227,13 @@ mod tests {
             .unwrap(),
         );
 
-        let config_map = tokio_test::block_on(state_client.get_state_configmap());
+        let_assert!(
+            Ok(ConfigMap {
+                data: Some(data),
+                ..
+            }) = tokio_test::block_on(state_client.get_state_configmap())
+        );
 
-        match config_map {
-            Ok(cm) => {
-                assert_eq!(cm.data.unwrap().len(), 10);
-            }
-            Err(e) => panic!("get_state_configmap errored: {}", e),
-        }
+        check!(data.len() == 10);
     }
 }

@@ -65,9 +65,9 @@ impl ConfigClient {
 mod tests {
     use super::*;
     use crate::model::EntityType;
+    use assert2::{check, let_assert};
     use chrono::naive::NaiveTime;
     use chrono::Weekday;
-    use pretty_assertions::assert_eq;
     use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Debug)]
@@ -84,94 +84,57 @@ mod tests {
 
     #[test]
     fn read_config_from_file_returns_deserialized_test_file() {
-        let config_client =
-            ConfigClient::new(ConfigClientConfig::new("test-config.yaml".to_string()).unwrap());
+        let_assert!(Ok(config) = ConfigClientConfig::new("test-config.yaml".to_string()));
+        let config_client = ConfigClient::new(config);
 
-        let config: Config = config_client.read_config_from_file().unwrap();
+        let_assert!(
+            Ok(Config {
+                location,
+                entity_type,
+                entity_name,
+            }) = config_client.read_config_from_file()
+        );
 
-        assert_eq!(config.location, "My Home".to_string());
-        assert_eq!(config.entity_type, EntityType::Device);
-        assert_eq!(config.entity_name, "TP-Link HS110".to_string());
+        check!(location == "My Home".to_string());
+        check!(entity_type == EntityType::Device);
+        check!(entity_name == "TP-Link HS110".to_string());
     }
 
     #[test]
     fn read_planner_config_from_file_returns_deserialized_test_file() {
-        let config_client =
-            ConfigClient::new(ConfigClientConfig::new("test-config.yaml".to_string()).unwrap());
+        let_assert!(Ok(config) = ConfigClientConfig::new("test-config.yaml".to_string()));
+        let config_client = ConfigClient::new(config);
 
-        let config: SpotPricePlannerConfig = config_client.read_planner_config_from_file().unwrap();
-
-        assert_eq!(config.load_profile.sections.len(), 2);
-        assert_eq!(config.load_profile.sections[0].duration_seconds, 7200);
-        assert_eq!(config.load_profile.sections[0].power_draw_watt, 2000.0);
-        assert_eq!(config.load_profile.sections[1].duration_seconds, 1800);
-        assert_eq!(config.load_profile.sections[1].power_draw_watt, 8000.0);
-
-        assert_eq!(config.plannable_local_time_slots.len(), 2);
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Thu)
-                .unwrap()
-                .len(),
-            2
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Thu)
-                .unwrap()[0]
-                .from,
-            NaiveTime::from_hms_opt(0, 0, 0).unwrap()
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Thu)
-                .unwrap()[0]
-                .till,
-            NaiveTime::from_hms_opt(7, 0, 0).unwrap()
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Thu)
-                .unwrap()[1]
-                .from,
-            NaiveTime::from_hms_opt(23, 0, 0).unwrap()
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Thu)
-                .unwrap()[1]
-                .till,
-            NaiveTime::from_hms_opt(0, 0, 0).unwrap()
+        let_assert!(
+            Ok(SpotPricePlannerConfig {
+                plannable_local_time_slots,
+                load_profile: LoadProfile { sections },
+                ..
+            }) = config_client.read_planner_config_from_file()
         );
 
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Sat)
-                .unwrap()
-                .len(),
-            1
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Sat)
-                .unwrap()[0]
-                .from,
-            NaiveTime::from_hms_opt(0, 0, 0).unwrap()
-        );
-        assert_eq!(
-            config
-                .plannable_local_time_slots
-                .get(&Weekday::Sat)
-                .unwrap()[0]
-                .till,
-            NaiveTime::from_hms_opt(0, 0, 0).unwrap()
-        );
+        let_assert!([sec_0, sec_1, ..] = sections.as_slice());
+
+        check!(sec_0.duration_seconds == 7200);
+        check!(sec_0.power_draw_watt == 2000.0);
+        check!(sec_1.duration_seconds == 1800);
+        check!(sec_1.power_draw_watt == 8000.0);
+
+        check!(plannable_local_time_slots.len() == 2);
+
+        // Thursday time slots ...
+        let_assert!(Some(thu_time_slots) = plannable_local_time_slots.get(&Weekday::Thu));
+        let_assert!([slot_0, slot_1, ..] = thu_time_slots.as_slice());
+
+        check!(slot_0.from == NaiveTime::from_hms_opt(0, 0, 0).unwrap());
+        check!(slot_0.till == NaiveTime::from_hms_opt(7, 0, 0).unwrap());
+        check!(slot_1.from == NaiveTime::from_hms_opt(23, 0, 0).unwrap());
+        check!(slot_1.till == NaiveTime::from_hms_opt(0, 0, 0).unwrap());
+
+        // Satureday time slots ...
+        let_assert!(Some(sat_time_slots) = plannable_local_time_slots.get(&Weekday::Sat));
+        let_assert!([slot_0, ..] = sat_time_slots.as_slice());
+        check!(slot_0.from == NaiveTime::from_hms_opt(0, 0, 0).unwrap());
+        check!(slot_0.till == NaiveTime::from_hms_opt(0, 0, 0).unwrap());
     }
 }
